@@ -45,15 +45,15 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
           <ul>
             <li>
               <Link
-                href="/"
+                href="#ranking"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
-                Home
+                Ranking
               </Link>
             </li>
             <li>
               <a
-                href="/sobre"
+                href="#about"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
                 Sobre
@@ -61,7 +61,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
             </li>
             <li>
               <a
-                href="/regulamento"
+                href="#regiment"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
                 Regulamento
@@ -80,10 +80,26 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
               <>
                 <li>
                   <a
-                    href="/opcao1"
+                    href="/groups"
                     className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
                   >
-                    Opção 1
+                    Turmas
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/years"
+                    className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
+                  >
+                    Anos Letivos
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/senses"
+                    className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
+                  >
+                    Sensos
                   </a>
                 </li>
                 <li>

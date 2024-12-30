@@ -46,10 +46,26 @@ const Dropdown = ({ username }) => {
         <ul className="absolute right-0 mt-2 bg-white text-black p-2 rounded-lg shadow-lg w-48">
           <li>
             <a
-              href="/opcao1"
+              href="/groups"
               className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
             >
-              Opção 1
+              Turmas
+            </a>
+          </li>
+          <li>
+            <a
+              href="/years"
+              className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
+            >
+              Anos
+            </a>
+          </li>
+          <li>
+            <a
+              href="/senses"
+              className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
+            >
+              Sensos
             </a>
           </li>
           <li>

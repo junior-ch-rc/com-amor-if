@@ -9,7 +9,7 @@ const Regiment = () => {
   return (
     <section
       id="regiment"
-      className="bg-white p-6 md:p-8 rounded-lg shadow-lg max-w-4xl mx-auto mt-[140px] md:-mt-[-160px]"
+      className="bg-white p-6 md:p-8 rounded-lg shadow-lg max-w-4xl mx-auto mt-[140px] md:-mt-[-160px] mb-20 mb:mt-28"
     >
       <h2 className="text-2xl font-bold text-primary mb-4">Regulamento</h2>
       <p className="text-sm md:text-base text-gray-800 mb-4">

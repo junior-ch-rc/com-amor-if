@@ -65,10 +65,10 @@ const Ranking = () => {
           {turmas.map((turma, index) => (
             <li
               key={turma.id}
-              className={`flex items-center justify-between px-[5px] md:px-4 py-4 rounded-md ${
+              className={`flex items-center justify-between rounded-md ${
                 index === 0
-                  ? "bg-primary text-white"
-                  : "bg-gray-100 text-gray-800"
+                  ? "bg-primary text-white px-[5px] md:px-4 py-4"
+                  : "bg-gray-100 text-gray-800 p-4"
               }`}
             >
               <div className="flex items-center">

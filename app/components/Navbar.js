@@ -5,7 +5,7 @@ import Link from "next/link";
 import Dropdown from "./Dropdown";
 import { getIFRNUrl } from "../utils/getIFRNUrl";
 
-const Navbar = ({ isLoggedIn, username, suapURL }) => {
+const Navbar = ({ isLoggedIn, username }) => {
   const usernameShort = username?.split(" ")[0]; // Extrai o primeiro nome
   const pathname = usePathname();
   const from = pathname || "/profile";
@@ -13,19 +13,19 @@ const Navbar = ({ isLoggedIn, username, suapURL }) => {
   return (
     <nav className="hidden md:flex space-x-6">
       <Link
-        href="#ranking"
+        href="/"
         className="hover:bg-primary-light px-4 py-2 rounded-lg transition duration-300 ease-in-out"
       >
-        Ranking
+        Home
       </Link>
       <Link
-        href="#about"
+        href="/#about"
         className="hover:bg-primary-light px-4 py-2 rounded-lg transition duration-300 ease-in-out"
       >
         Sobre
       </Link>
       <Link
-        href="#regiment"
+        href="/#regiment"
         className="hover:bg-primary-light px-4 py-2 rounded-lg transition duration-300 ease-in-out"
       >
         Regulamento

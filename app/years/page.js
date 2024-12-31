@@ -6,7 +6,7 @@ import Modal from "../components/Modal";
 import Button from "../components/Button";
 import MessageBox from "../components/MessageBox";
 import NotAuthorized from "../components/NotAuthorized";
-import hasRole from "../utils/hasRole";
+import { isFromCategory } from "../utils/role";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { fetchPrivateData, postPrivateData } from "../utils/api"; // Import das funções
 import { useAuth } from "../providers/AuthProvider";
@@ -28,7 +28,7 @@ const AcademicYearManagement = () => {
 
   useEffect(() => {
     const fetchYears = async () => {
-      if (user !== null && hasRole(user, "ADMINISTRADOR")) {
+      if (user !== null && isFromCategory(user, "Admin")) {
         try {
           const data = await fetchPrivateData("anoletivo/anos", token);
           setYears(data);
@@ -110,8 +110,7 @@ const AcademicYearManagement = () => {
   // Enquanto estiver carregando, exibe o LoadingSpinner
   if (!isReady) return <LoadingSpinner />;
 
-  if (user === null || !hasRole(user, "ADMINISTRADOR"))
-    return <NotAuthorized />;
+  if (user === null || !isFromCategory(user, "Admin")) return <NotAuthorized />;
 
   return (
     <div className="container mx-auto p-4">

@@ -5,7 +5,7 @@ import { FaUserCircle } from "react-icons/fa"; // Importando o ícone
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "../providers/AuthProvider";
-import hasRole from "../utils/hasRole";
+import { isFromCategory } from "../utils/role";
 
 const Dropdown = ({ username }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,7 +45,7 @@ const Dropdown = ({ username }) => {
       </button>
       {isOpen && (
         <ul className="absolute right-0 mt-2 bg-white text-black p-2 rounded-lg shadow-lg w-48">
-          {hasRole(user, "ADMINISTRADOR") && (
+          {isFromCategory(user, "Admin") && (
             <>
               <li>
                 <a
@@ -65,14 +65,19 @@ const Dropdown = ({ username }) => {
               </li>
             </>
           )}
-          <li>
-            <a
-              href="/senses"
-              className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
-            >
-              Sensos
-            </a>
-          </li>
+          {(isFromCategory(user, "Aval") || isFromCategory(user, "Admin")) && (
+            <>
+              {" "}
+              <li>
+                <a
+                  href="/points"
+                  className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
+                >
+                  Lançar Pontos
+                </a>
+              </li>
+            </>
+          )}
           <li>
             <a
               href="#"

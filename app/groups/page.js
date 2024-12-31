@@ -6,7 +6,7 @@ import Modal from "../components/Modal";
 import Button from "../components/Button";
 import MessageBox from "../components/MessageBox";
 import NotAuthorized from "../components/NotAuthorized";
-import hasRole from "../utils/hasRole";
+import { isFromCategory } from "../utils/role";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { fetchPrivateData, postPrivateData } from "../utils/api";
 import { useAuth } from "../providers/AuthProvider";
@@ -34,7 +34,7 @@ const GroupManagement = () => {
 
   useEffect(() => {
     const fetchTurmas = async () => {
-      if (user !== null && hasRole(user, "ADMINISTRADOR")) {
+      if (user !== null && isFromCategory(user, "Admin")) {
         try {
           const data = await fetchPrivateData("turma/turmas", token);
           setTurmas(data);
@@ -49,7 +49,7 @@ const GroupManagement = () => {
 
   useEffect(() => {
     const fetchYears = async () => {
-      if (user !== null && hasRole(user, "ADMINISTRADOR")) {
+      if (user !== null && isFromCategory(user, "Admin")) {
         try {
           const data = await fetchPrivateData("anoletivo/anos", token);
           const openYears = data.filter((year) => year.status === "Aberto");
@@ -120,8 +120,7 @@ const GroupManagement = () => {
   }, [isLoading]);
 
   if (!isReady) return <LoadingSpinner />;
-  if (user === null || !hasRole(user, "ADMINISTRADOR"))
-    return <NotAuthorized />;
+  if (user === null || !isFromCategory(user, "Admin")) return <NotAuthorized />;
 
   return (
     <div className="container mx-auto p-4">

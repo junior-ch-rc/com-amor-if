@@ -43,7 +43,7 @@ const HomePage = () => {
   }
 
   return (
-    <>
+    <div className="bg-wheat pb-20 md:pb-28">
       {errorMessage && (
         <MessageBox
           message={errorMessage}
@@ -61,7 +61,7 @@ const HomePage = () => {
       <Regiment />
 
       <BackToTop />
-    </>
+    </div>
   );
 };
 

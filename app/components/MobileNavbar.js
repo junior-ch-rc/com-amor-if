@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { useAuth } from "../providers/AuthProvider";
 import { getIFRNUrl } from "../utils/getIFRNUrl";
-import hasRole from "../utils/hasRole";
+import { isFromCategory } from "../utils/role";
 
 const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
   const menuRef = useRef(null);
@@ -79,9 +79,8 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
               </li>
             ) : (
               <>
-                {hasRole(user, "ADMINISTRADOR") && (
+                {isFromCategory(user, "Admin") && (
                   <>
-                    {" "}
                     <li>
                       <a
                         href="/groups"
@@ -100,14 +99,20 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
                     </li>
                   </>
                 )}
-                <li>
-                  <a
-                    href="/senses"
-                    className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
-                  >
-                    Sensos
-                  </a>
-                </li>
+                {isFromCategory(user, "Aval") ||
+                  (isFromCategory(user, "Admin") && (
+                    <>
+                      {" "}
+                      <li>
+                        <a
+                          href="/points"
+                          className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
+                        >
+                          Pontos
+                        </a>
+                      </li>
+                    </>
+                  ))}
                 <li>
                   <a
                     href="#"

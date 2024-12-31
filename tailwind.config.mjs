@@ -23,6 +23,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        wheat: "#f5deb3",
         primary: "#18a08c",
         "primary-light": "#49c8aa",
         detail: {

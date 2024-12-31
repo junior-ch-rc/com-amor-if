@@ -12,7 +12,7 @@ import BackToTop from "./components/BackToTop";
 
 const HomePage = () => {
   const params = useSearchParams();
-  const { login, user, isLoading } = useAuth(); // Acessa o estado de loading e user
+  const { login, isLoading } = useAuth(); // Acessa o estado de loading e user
   const code = params.get("code");
   const [isLoginProcessed, setIsLoginProcessed] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);

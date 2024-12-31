@@ -7,11 +7,12 @@ import { useRouter } from "next/navigation";
 
 import { useAuth } from "../providers/AuthProvider";
 import { getIFRNUrl } from "../utils/getIFRNUrl";
+import hasRole from "../utils/hasRole";
 
 const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
   const menuRef = useRef(null);
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const router = useRouter();
   const from = pathname || "/profile";
 
@@ -78,22 +79,27 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
               </li>
             ) : (
               <>
-                <li>
-                  <a
-                    href="/groups"
-                    className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
-                  >
-                    Turmas
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/years"
-                    className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
-                  >
-                    Anos Letivos
-                  </a>
-                </li>
+                {hasRole(user, "ADMINISTRADOR") && (
+                  <>
+                    {" "}
+                    <li>
+                      <a
+                        href="/groups"
+                        className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
+                      >
+                        Turmas
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/years"
+                        className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
+                      >
+                        Anos Letivos
+                      </a>
+                    </li>
+                  </>
+                )}
                 <li>
                   <a
                     href="/senses"

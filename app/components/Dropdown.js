@@ -5,11 +5,12 @@ import { FaUserCircle } from "react-icons/fa"; // Importando o ícone
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "../providers/AuthProvider";
+import hasRole from "../utils/hasRole";
 
 const Dropdown = ({ username }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const router = useRouter();
 
   const handleLogout = (e) => {
@@ -44,22 +45,26 @@ const Dropdown = ({ username }) => {
       </button>
       {isOpen && (
         <ul className="absolute right-0 mt-2 bg-white text-black p-2 rounded-lg shadow-lg w-48">
-          <li>
-            <a
-              href="/groups"
-              className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
-            >
-              Turmas
-            </a>
-          </li>
-          <li>
-            <a
-              href="/years"
-              className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
-            >
-              Anos
-            </a>
-          </li>
+          {hasRole(user, "ADMINISTRADOR") && (
+            <>
+              <li>
+                <a
+                  href="/groups"
+                  className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
+                >
+                  Turmas
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/years"
+                  className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
+                >
+                  Anos
+                </a>
+              </li>
+            </>
+          )}
           <li>
             <a
               href="/senses"

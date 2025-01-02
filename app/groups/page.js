@@ -40,7 +40,7 @@ const GroupManagement = () => {
           setTurmas(data);
           setFilteredTurmas(data);
         } catch (error) {
-          setErrorMessage("Erro ao buscar turmas: " + error.message);
+          setErrorMessage("Erro ao buscar turmas: " + error.response.data.errors[0]);
         }
       }
     };
@@ -56,7 +56,7 @@ const GroupManagement = () => {
           setYears(openYears);
           setFilteredYears(openYears);
         } catch (error) {
-          setErrorMessage("Erro ao buscar anos letivos: " + error.message);
+          setErrorMessage("Erro ao buscar anos letivos: " + error.response.data.errors[0]);
         }
       }
     };
@@ -103,7 +103,7 @@ const GroupManagement = () => {
       setModalOpen(false);
       setEditingTurma(null);
     } catch (error) {
-      setErrorMessage("Erro ao salvar turma: " + error.message);
+      setErrorMessage("Erro ao salvar turma: " + error.response.data.errors[0]);
     }
   };
 
@@ -127,7 +127,7 @@ const GroupManagement = () => {
       {errorMessage && (
         <MessageBox
           message={errorMessage}
-          color="detail-subtle"
+          color="detail-minor"
           onClose={() => setErrorMessage(null)}
         />
       )}

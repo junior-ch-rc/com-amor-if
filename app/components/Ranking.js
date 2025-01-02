@@ -27,7 +27,7 @@ const Ranking = () => {
       const sortedTurmas = data.sort((a, b) => b.pontuacao - a.pontuacao);
       setTurmas(sortedTurmas);
     } catch (error) {
-      console.error("Erro ao buscar turmas:", error.message);
+      setErrorMessage("Erro ao buscar turmas: " + error.response.data.errors[0]);
       setErrorMessage(
         "Erro ao carregar o ranking. Por favor, tente novamente mais tarde."
       );
@@ -55,7 +55,7 @@ const Ranking = () => {
       {errorMessage && (
         <MessageBox
           message={errorMessage}
-          color="detail-subtle"
+          color="detail-minor"
           onClose={() => setErrorMessage(null)}
         />
       )}

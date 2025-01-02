@@ -47,7 +47,7 @@ const HomePage = () => {
       {errorMessage && (
         <MessageBox
           message={errorMessage}
-          color="detail-subtle"
+          color="detail-minor"
           onClose={() => setErrorMessage(null)}
         />
       )}

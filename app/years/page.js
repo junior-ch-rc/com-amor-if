@@ -34,7 +34,9 @@ const AcademicYearManagement = () => {
           setYears(data);
           setFilteredYears(data);
         } catch (error) {
-          setErrorMessage("Erro ao buscar anos letivos: " + error.message);
+          setErrorMessage(
+            "Erro ao buscar anos letivos: " + error.response.data.errors[0]
+          );
         }
       }
     };
@@ -66,7 +68,9 @@ const AcademicYearManagement = () => {
       await postPrivateData("anoletivo/ano", { ...year, aberto: false }, token);
       setYears(years.filter((y) => y.id !== year.id));
     } catch (error) {
-      setErrorMessage("Erro ao deletar ano letivo: " + error.message);
+      setErrorMessage(
+        "Erro ao deletar ano letivo: " + error.response.data.errors[0]
+      );
     }
   };
 
@@ -89,7 +93,9 @@ const AcademicYearManagement = () => {
       setModalOpen(false);
       setEditingYear(null);
     } catch (error) {
-      setErrorMessage("Erro ao salvar ano letivo: " + error.message);
+      setErrorMessage(
+        "Erro ao salvar ano letivo: " + error.response.data.errors[0]
+      );
     }
   };
 
@@ -117,7 +123,7 @@ const AcademicYearManagement = () => {
       {errorMessage && (
         <MessageBox
           message={errorMessage}
-          color="detail-subtle"
+          color="detail-minor"
           onClose={() => setErrorMessage(null)}
         />
       )}

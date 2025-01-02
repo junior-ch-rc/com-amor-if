@@ -18,6 +18,8 @@ export default {
     "hover:text-detail-dark",
     "hover:text-detail-subtle-dark",
     "hover:text-detail-minor-dark",
+    "bg-lime-400",
+    "border-lime-400"
     // Adicione outras classes dinâmicas conforme necessário
   ],
   theme: {

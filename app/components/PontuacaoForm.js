@@ -32,7 +32,7 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
         );
         setTurmas(data);
       } catch (error) {
-        setError("Erro ao carregar turmas: " + error.message);
+        setError("Erro ao carregar turmas: " + error.response.data.errors[0]);
       }
     };
     fetchTurmas();
@@ -60,7 +60,7 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit(formData, setFormData, setTipoRegra);
   };
 
   return (

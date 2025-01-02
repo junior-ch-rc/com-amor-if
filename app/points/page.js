@@ -43,7 +43,6 @@ const PointsPage = () => {
           acc[senso].push(rule);
           return acc;
         }, {});
-        console.log(grouped["Utilização"]);
         setGroupedRules(grouped);
 
         // Define a aba ativa como a primeira
@@ -51,11 +50,18 @@ const PointsPage = () => {
           setActiveTab(Object.keys(grouped)[0]);
         }
       } catch (error) {
-        setErrorMessage("Erro ao carregar regras: " + error.message);
+        setErrorMessage(
+          "Erro ao carregar regras: " + error.response.data.errors[0]
+        );
       }
     };
-    fetchRules();
-  }, [token]);
+
+    if (
+      user !== null &&
+      !(!isFromCategory(user, "Admin") && !isFromCategory(user, "Aval"))
+    )
+      fetchRules();
+  }, [token, user]);
 
   useEffect(() => {
     // Aguarda o carregamento do usuário
@@ -81,53 +87,68 @@ const PointsPage = () => {
   )
     return <NotAuthorized />;
 
-    const handleSubmit = async (formData) => {      
-  
-      // Verificar se o token está presente
-      if (!token) {
-        setErrorMessage("Token de autenticação não encontrado");
-        return;
-      }
-  
-      // Criar um objeto com os dados de formData que serão enviados
-      const dataToSend = {
-        id_turma: formData.idTurma,
-        id_regra: formData.idRegra,
-        pontos: formData.pontos,
-        motivacao: formData.motivacao,
-        matriculaAluno: formData.matriculaAluno,
-        bimestre: formData.bimestre,
-        turno: formData.turno,
-      };
-  
-      // Chamar o método para enviar os dados
-      try {
-        const response = await postPrivateData(
-          "pontuacao/lancar", // Endpoint onde a pontuação será lançada
-          dataToSend, // Dados do formulário
-          token // Token de autenticação
-        );
-        console.log(response);
-        setSuccessMessage("Pontuação lançada com sucesso");
-      } catch (error) {
-        setErrorMessage("Erro ao enviar pontuação: " + error);
-      }
+  const handleSubmit = async (formData, setFormData, setTipoRegra) => {
+    // Verificar se o token está presente
+    if (!token) {
+      setErrorMessage("Token de autenticação não encontrado");
+      return;
+    }
+
+    // Criar um objeto com os dados de formData que serão enviados
+    const dataToSend = {
+      id_turma: formData.idTurma,
+      id_regra: formData.idRegra,
+      pontos: formData.pontos,
+      motivacao: formData.motivacao,
+      matricula_aluno: formData.matriculaAluno,
+      bimestre: formData.bimestre,
+      turno: formData.turno,
     };
+
+    // Chamar o método para enviar os dados
+    try {
+      const response = await postPrivateData(
+        "pontuacao/lancar", // Endpoint onde a pontuação será lançada
+        dataToSend, // Dados do formulário
+        token // Token de autenticação
+      );
+
+      setSuccessMessage("Pontuação lançada com sucesso");
+
+      setFormData({
+        idTurma: "",
+        idRegra: "",
+        pontos: "",
+        operacao: "",
+        motivacao: "",
+        matriculaAluno: "",
+        bimestre: 0,
+        turno: "",
+      });
+
+      setTipoRegra(null);
+    } catch (error) {
+      console.log(error);
+      setErrorMessage(
+        "Erro ao enviar pontuação: " + error.response.data.errors[0]
+      );
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
       {errorMessage && (
         <MessageBox
           message={errorMessage}
-          color="detail-subtle"
+          color="detail-minor"
           onClose={() => setErrorMessage(null)}
         />
       )}
 
       {successMessage && (
         <MessageBox
-          message={errorMessage}
-          color="green"
+          message={successMessage}
+          color="lime-400"
           onClose={() => setSuccessMessage(null)}
         />
       )}

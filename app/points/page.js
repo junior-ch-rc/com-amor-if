@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Tab from "../components/Tab";
-import Table from "../components/Table";
 import MessageBox from "../components/MessageBox";
 import NotAuthorized from "../components/NotAuthorized";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { fetchPrivateData } from "../utils/api"; // Função de requisição
 import { useAuth } from "../providers/AuthProvider";
+import PontuacaoForm from "../components/PontuacaoForm"; // Importando o formulário
 
+import { postPrivateData } from "../utils/api";
 import { isFromCategory } from "../utils/role";
 
 // Cores para cada senso
@@ -21,14 +22,12 @@ const SENSE_COLORS = {
 };
 
 const PointsPage = () => {
-  const [rules, setRules] = useState([]);
   const [groupedRules, setGroupedRules] = useState({});
   const [activeTab, setActiveTab] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const { user, isLoading, getToken } = useAuth();
   const [isReady, setIsReady] = useState(false);
-  const [page, setPage] = useState(1); // Página atual
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Número de itens por página
   const token = getToken(); // Obtém o token do usuário logado.
 
   // Busca as regras permitidas para o usuário
@@ -36,7 +35,6 @@ const PointsPage = () => {
     const fetchRules = async () => {
       try {
         const data = await fetchPrivateData("regras/permitidas", token);
-        setRules(data);
 
         // Agrupa as regras por senso
         const grouped = data.reduce((acc, rule) => {
@@ -45,7 +43,7 @@ const PointsPage = () => {
           acc[senso].push(rule);
           return acc;
         }, {});
-
+        console.log(grouped["Utilização"]);
         setGroupedRules(grouped);
 
         // Define a aba ativa como a primeira
@@ -60,24 +58,17 @@ const PointsPage = () => {
   }, [token]);
 
   useEffect(() => {
-    // Atualiza o total de páginas toda vez que o activeTab mudar
-    if (activeTab && groupedRules[activeTab]) {
-      const totalPages = Math.ceil(
-        groupedRules[activeTab].length / itemsPerPage
-      );
-      setPage(1); // Reseta para a primeira página quando mudar a aba
-      setTotalPages(totalPages);
-    }
-  }, [activeTab, groupedRules, itemsPerPage]);
-
-  const [totalPages, setTotalPages] = useState(1); // Total de páginas baseado na aba selecionada
-
-  useEffect(() => {
     // Aguarda o carregamento do usuário
     if (!isLoading) {
       setIsReady(true);
     }
   }, [isLoading]);
+
+  useEffect(() => {
+    if (Object.keys(groupedRules).length > 0) {
+      setActiveTab(Object.keys(groupedRules)[0]);
+    }
+  }, [groupedRules]);
 
   // Enquanto estiver carregando, exibe o LoadingSpinner
   if (!isReady) return <LoadingSpinner />;
@@ -90,19 +81,38 @@ const PointsPage = () => {
   )
     return <NotAuthorized />;
 
-  // Função para mudar a página
-  const handlePageChange = (newPage) => {
-    if (newPage < 1 || newPage > totalPages) return;
-    setPage(newPage);
-  };
-
-  // Filtra as regras da página atual
-  const getPaginatedData = () => {
-    if (!activeTab || !groupedRules[activeTab]) return [];
-    const startIndex = (page - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return groupedRules[activeTab]?.slice(startIndex, endIndex) || [];
-  };
+    const handleSubmit = async (formData) => {      
+  
+      // Verificar se o token está presente
+      if (!token) {
+        setErrorMessage("Token de autenticação não encontrado");
+        return;
+      }
+  
+      // Criar um objeto com os dados de formData que serão enviados
+      const dataToSend = {
+        id_turma: formData.idTurma,
+        id_regra: formData.idRegra,
+        pontos: formData.pontos,
+        motivacao: formData.motivacao,
+        matriculaAluno: formData.matriculaAluno,
+        bimestre: formData.bimestre,
+        turno: formData.turno,
+      };
+  
+      // Chamar o método para enviar os dados
+      try {
+        const response = await postPrivateData(
+          "pontuacao/lancar", // Endpoint onde a pontuação será lançada
+          dataToSend, // Dados do formulário
+          token // Token de autenticação
+        );
+        console.log(response);
+        setSuccessMessage("Pontuação lançada com sucesso");
+      } catch (error) {
+        setErrorMessage("Erro ao enviar pontuação: " + error);
+      }
+    };
 
   return (
     <div className="container mx-auto p-4">
@@ -111,6 +121,14 @@ const PointsPage = () => {
           message={errorMessage}
           color="detail-subtle"
           onClose={() => setErrorMessage(null)}
+        />
+      )}
+
+      {successMessage && (
+        <MessageBox
+          message={errorMessage}
+          color="green"
+          onClose={() => setSuccessMessage(null)}
         />
       )}
 
@@ -136,27 +154,11 @@ const PointsPage = () => {
           >
             {activeTab}
           </h2>
-          <div className="overflow-x-auto">
-            <Table
-              headers={[
-                "Descricao",
-                "Operacao",
-                "Valor Minimo",
-                "Valor Maximo",
-              ]}
-              data={getPaginatedData().map((rule) => ({
-                descricao: rule.descricao,
-                operacao: rule.operacao,
-                valor_minimo: rule.valorMinimo, // Corrigido para o formato esperado
-                valor_maximo: rule.valorMaximo, // Corrigido para o formato esperado
-              }))}
-              page={page}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              searchValue=""
-              onSearch={() => {}}
-            />
-          </div>
+          <PontuacaoForm
+            onSubmit={handleSubmit}
+            key={activeTab} // Força re-renderização ao mudar de aba
+            regrasDisponiveis={groupedRules[activeTab]}
+          />
         </div>
       )}
     </div>

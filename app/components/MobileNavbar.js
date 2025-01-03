@@ -19,7 +19,6 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
   const handleLogout = (e) => {
     e.preventDefault();
     logout();
-    router.push("/");
   };
 
   return (

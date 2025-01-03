@@ -12,7 +12,7 @@ import BackToTop from "./components/BackToTop";
 
 const HomePage = () => {
   const params = useSearchParams();
-  const { login, isLoading } = useAuth(); // Acessa o estado de loading e user
+  const { login, isLoading, user } = useAuth(); // Acessa o estado de loading e user
   const code = params.get("code");
   const [isLoginProcessed, setIsLoginProcessed] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -38,7 +38,7 @@ const HomePage = () => {
   }, [code, isLoginProcessed, login]);
 
   // Verifica se está carregando ou se o usuário não está autenticado
-  if (isLoading) {
+  if (isLoading || (code && user === null)) {
     return <LoadingSpinner />; // Exibe o carregamento enquanto o estado de usuário não é obtido
   }
 

@@ -16,7 +16,6 @@ const Dropdown = ({ username }) => {
   const handleLogout = (e) => {
     e.preventDefault();
     logout();
-    router.push("/");
   };
 
   const toggleDropdown = () => setIsOpen(!isOpen);

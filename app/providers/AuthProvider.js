@@ -90,6 +90,7 @@ export const AuthProvider = ({ children }) => {
     removeCookie("refresh_token");
     removeCookie("roles");
     setUser(null);
+    router.push("/");
   };
 
   // Função para obter o token
@@ -106,7 +107,6 @@ export const AuthProvider = ({ children }) => {
         logout,
         getCurrentUser,
         isLoading,
-        setIsLoading,
       }}
     >
       {children}

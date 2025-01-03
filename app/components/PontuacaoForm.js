@@ -7,7 +7,7 @@ import { useAuth } from "../providers/AuthProvider";
 const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
   const { getToken } = useAuth();
   const [regras, setRegras] = useState(regrasDisponiveis || []);
-  const [operacao, setOperacao] = useState("");
+  const [operacao, setOperacao] = useState(null);
   const [turmas, setTurmas] = useState([]);
   const [formData, setFormData] = useState({
     idTurma: "",
@@ -39,15 +39,19 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
   }, [getToken]);
 
   const handleRegraChange = (regraId) => {
-    const regraSelecionada = regras.find((regra) => regra.id === parseInt(regraId));
+    const regraSelecionada = regras.find(
+      (regra) => regra.id === parseInt(regraId)
+    );
     setTipoRegra(regraSelecionada?.tipoRegra || null);
     setOperacao(regraSelecionada?.operacao || "");
     setFormData({
       ...formData,
       idRegra: regraId,
       operacao: regraSelecionada?.operacao || "",
-      pontos: regraSelecionada?.tipoRegra?.fixo ? regraSelecionada.valorMinimo : "",
-      bimestre: regraSelecionada?.tipoRegra?.bimestreExtra ? 4 : formData.bimestre,
+      pontos: regraSelecionada?.tipoRegra?.fixo
+        ? regraSelecionada.valorMinimo
+        : "",
+      bimestre: regraSelecionada?.tipoRegra?.bimestreExtra ? 4 : 0,
       valorMinimo: regraSelecionada?.valorMinimo || 0,
       valorMaximo: regraSelecionada?.valorMaximo || 500,
     });
@@ -60,7 +64,7 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData, setFormData, setTipoRegra);
+    onSubmit(formData, setFormData, setTipoRegra, setOperacao);
   };
 
   return (
@@ -86,15 +90,25 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
 
       {/* Indicativo de operação */}
       {operacao && (
-        <div className={`mt-2 ${operacao === "SUM" ? "text-green-500" : "text-red-500"}`}>
-          <p>{operacao === "SUM" ? "Operação de adição" : "Operação de subtração"}</p>
+        <div
+          className={`mt-2 ${
+            operacao === "SUM" ? "text-green-500" : "text-red-500"
+          }`}
+        >
+          <p>
+            {operacao === "SUM"
+              ? "Operação de adição"
+              : "Operação de subtração"}
+          </p>
         </div>
       )}
 
       {/* Select Turma ou Turno */}
       {tipoRegra?.porTurno ? (
         <div>
-          <label className="block text-sm font-medium text-gray-700">Turno</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Turno
+          </label>
           <select
             name="turno"
             value={formData.turno}
@@ -109,7 +123,9 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
         </div>
       ) : (
         <div>
-          <label className="block text-sm font-medium text-gray-700">Turma</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Turma
+          </label>
           <select
             name="idTurma"
             value={formData.idTurma}
@@ -128,33 +144,43 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
       )}
 
       {/* Select Bimestre */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Bimestre</label>
-        <select
-          name="bimestre"
-          value={formData.bimestre}
-          onChange={handleInputChange}
-          className="w-full mt-1 p-2 border rounded"
-          required
-          disabled={tipoRegra?.bimestreExtra}
-        >
-          <option value="0">1º Bimestre</option>
-          <option value="1">2º Bimestre</option>
-          <option value="2">3º Bimestre</option>
-          <option value="3">4º Bimestre</option>
-          <option value="4">Bimestre Extra</option>
-        </select>
-      </div>
+      {(tipoRegra?.frequencia !== 0 || tipoRegra?.bimestreExtra) && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Bimestre
+          </label>
+          <select
+            name="bimestre"
+            value={formData.bimestre}
+            onChange={handleInputChange}
+            className="w-full mt-1 p-2 border rounded"
+            required
+            disabled={tipoRegra?.bimestreExtra}
+          >
+            <option value="0">1º Bimestre</option>
+            <option value="1">2º Bimestre</option>
+            <option value="2">3º Bimestre</option>
+            <option value="3">4º Bimestre</option>
+            <option value="4">Bimestre Extra</option>
+          </select>
+        </div>
+      )}
 
       {/* Pontos */}
       {tipoRegra?.fixo ? (
         <div>
-          <label className="block text-sm font-medium text-gray-700">Pontos</label>
-          <p className="mt-1 text-gray-600">{formData.pontos} pontos (valor fixo)</p>
+          <label className="block text-sm font-medium text-gray-700">
+            Pontos
+          </label>
+          <p className="mt-1 text-gray-600">
+            {formData.pontos} pontos (valor fixo)
+          </p>
         </div>
       ) : (
         <div>
-          <label className="block text-sm font-medium text-gray-700">Pontos</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Pontos
+          </label>
           <input
             type="number"
             name="pontos"
@@ -171,7 +197,9 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
       {/* Matrícula do Aluno */}
       {tipoRegra?.temAluno && (
         <div>
-          <label className="block text-sm font-medium text-gray-700">Matrícula do Aluno</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Matrícula do Aluno
+          </label>
           <input
             type="text"
             name="matriculaAluno"
@@ -185,7 +213,9 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
 
       {/* Motivação */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">Motivação</label>
+        <label className="block text-sm font-medium text-gray-700">
+          Motivação
+        </label>
         <textarea
           name="motivacao"
           value={formData.motivacao}

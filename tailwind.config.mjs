@@ -19,7 +19,9 @@ export default {
     "hover:text-detail-subtle-dark",
     "hover:text-detail-minor-dark",
     "bg-lime-400",
-    "border-lime-400"
+    "border-lime-400",
+    "bg-gray-400",
+    "bg-opacity-50",
     // Adicione outras classes dinâmicas conforme necessário
   ],
   theme: {

@@ -1,8 +1,29 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 
-const MessageBox = ({ message, color = "detail", onClose }) => {
+const MessageBox = ({ message, color = "detail", onClose, timeout = 5000 }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [progress, setProgress] = useState(100);
+
+  useEffect(() => {
+    const interval = 10; // Atualizações frequentes para a barra
+    const step = (100 / timeout) * interval;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => Math.max(0, prev - step));
+    }, interval);
+
+    const autoCloseTimer = setTimeout(() => {
+      setIsVisible(false);
+      if (onClose) onClose();
+      clearInterval(timer);
+    }, timeout);
+
+    return () => {
+      clearInterval(timer);
+      clearTimeout(autoCloseTimer);
+    };
+  }, [timeout, onClose]);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -14,11 +35,15 @@ const MessageBox = ({ message, color = "detail", onClose }) => {
   return (
     <div
       className={clsx(
-        "fixed top-4 left-1/2 transform -translate-x-1/2 max-w-sm w-full p-4 border-l-4 shadow-lg rounded-md z-50",
+        "fixed top-4 left-1/2 transform -translate-x-1/2 max-w-sm w-full p-4 shadow-lg rounded-md z-50",
         `bg-${color}`,
         `border-${color}`
       )}
     >
+      <div
+        className="absolute top-0 left-0 h-1 w-full bg-gray-400 bg-opacity-50"
+        style={{ width: `${progress}%`, transition: "width 0.1s linear" }}
+      />
       <div className="flex items-start">
         <div className="flex-grow">
           <p className="text-sm leading-relaxed break-words max-h-40 overflow-y-auto">

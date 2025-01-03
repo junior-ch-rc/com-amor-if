@@ -87,7 +87,12 @@ const PointsPage = () => {
   )
     return <NotAuthorized />;
 
-  const handleSubmit = async (formData, setFormData, setTipoRegra) => {
+  const handleSubmit = async (
+    formData,
+    setFormData,
+    setTipoRegra,
+    setOperacao
+  ) => {
     // Verificar se o token está presente
     if (!token) {
       setErrorMessage("Token de autenticação não encontrado");
@@ -127,6 +132,7 @@ const PointsPage = () => {
       });
 
       setTipoRegra(null);
+      setOperacao(null);
     } catch (error) {
       console.log(error);
       setErrorMessage(

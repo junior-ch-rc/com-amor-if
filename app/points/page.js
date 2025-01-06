@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Tab from "../components/Tab";
+import Table from "../components/Table";
 import MessageBox from "../components/MessageBox";
 import NotAuthorized from "../components/NotAuthorized";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -29,6 +30,73 @@ const PointsPage = () => {
   const { user, isLoading, getToken } = useAuth();
   const [isReady, setIsReady] = useState(false);
   const token = getToken(); // Obtém o token do usuário logado.
+
+  const [pontuacoes, setPontuacoes] = useState([]);
+  const [filteredPontuacoes, setFilteredPontuacoes] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const itemsPerPage = 10;
+
+  const fetchPontuacoes = async () => {
+    try {
+      const data = await fetchPrivateData(
+        "pontuacao/pontuacaoPorServidor",
+        token
+      );
+
+      // Agrupar as pontuações por senso
+      const groupedBySenso = data.reduce((acc, pontuacao) => {
+        const senso = pontuacao.regra.senso.descricao || "Sem Senso";
+        if (!acc[senso]) acc[senso] = [];
+        acc[senso].push(pontuacao);
+        return acc;
+      }, {});
+
+      console.log(groupedBySenso);
+
+      setPontuacoes(groupedBySenso);
+      setTotalPages(Math.ceil(data.length / 10)); // Ajuste conforme a quantidade de dados por página
+
+      // Filtra inicialmente pela pesquisa
+      filterPontuacoes(searchTerm);
+    } catch (error) {
+      setErrorMessage(
+        "Erro ao carregar pontuações: " + error.response.data?.errors[0]
+      );
+    }
+  };
+
+  // Função para filtrar as pontuações com base no nome da turma
+  const filterPontuacoes = (search) => {
+    setSearchTerm(search);
+    const filtered = pontuacoes[activeTab]?.filter((pontuacao) =>
+      pontuacao.turma.nome.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredPontuacoes(filtered);
+
+    if (filtered?.length > 0) {
+      setTotalPages(Math.ceil(filtered.length / itemsPerPage)); // Atualiza totalPages com o filtro aplicado
+    }
+  };
+
+  // Chamada do fetch quando o componente é carregado ou quando a aba ativa muda
+  useEffect(() => {
+    if (user && isReady) {
+      fetchPontuacoes();
+    }
+  }, [user, isReady, activeTab]);
+
+  useEffect(() => {
+    filterPontuacoes(searchTerm); // Atualiza o filtro sempre que o searchTerm mudar
+  }, [pontuacoes, activeTab]);
+
+  // Função de mudança de página
+  const onPageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   // Busca as regras permitidas para o usuário
   useEffect(() => {
@@ -133,12 +201,18 @@ const PointsPage = () => {
 
       setTipoRegra(null);
       setOperacao(null);
+      fetchPontuacoes();
     } catch (error) {
-      console.log(error);
       setErrorMessage(
         "Erro ao enviar pontuação: " + error.response.data.errors[0]
       );
     }
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSearchTerm("");
+    setCurrentPage(1);
   };
 
   return (
@@ -165,7 +239,7 @@ const PointsPage = () => {
         <Tab
           tabs={Object.keys(groupedRules)}
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
           tabColors={SENSE_COLORS}
         />
       </div>
@@ -185,6 +259,49 @@ const PointsPage = () => {
             onSubmit={handleSubmit}
             key={activeTab} // Força re-renderização ao mudar de aba
             regrasDisponiveis={groupedRules[activeTab]}
+          />
+
+          <h2
+            className="text-xl font-semibold my-8"
+            style={{ color: SENSE_COLORS[activeTab] }}
+          >
+            Pontuações Registradas
+          </h2>
+
+          <Table
+            headers={[
+              "Nome da Turma",
+              "Regra",
+              "Operacao",
+              "Pontos",
+              "Aplicado",
+              "Anulado",
+            ]}
+            data={
+              (filteredPontuacoes && filterPontuacoes.length) > 0
+                ? filteredPontuacoes
+                    .slice(
+                      (currentPage - 1) * itemsPerPage,
+                      currentPage * itemsPerPage
+                    )
+                    .map((pontuacao) => ({
+                      nome_da_turma: pontuacao.nomeTurma,
+                      regra: pontuacao.regra.descricao,
+                      operacao:
+                        pontuacao.operacao === "SUM" ? "Adição" : "Subtração",
+                      pontos: pontuacao.pontos,
+                      contador: pontuacao.contador,
+                      aplicado: pontuacao.aplicado ? "Verdadeiro" : "Falso",
+                      anulado: pontuacao.anulado ? "Verdadeiro" : "Falso",
+                    }))
+                : []
+            }
+            actions={[]}
+            page={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            searchValue={searchTerm}
+            onSearch={filterPontuacoes}
           />
         </div>
       )}

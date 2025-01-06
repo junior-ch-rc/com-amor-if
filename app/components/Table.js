@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 const Table = ({
   headers,
   data,
@@ -38,7 +36,7 @@ const Table = ({
                   {header}
                 </th>
               ))}
-              {actions && (
+              {actions && actions.length > 0 && (
                 <th className="px-4 py-2 border border-gray-200 text-left text-sm font-medium text-gray-600">
                   Ações
                 </th>
@@ -46,31 +44,44 @@ const Table = ({
             </tr>
           </thead>
           <tbody>
-            {data.map((row, index) => (
-              <tr key={index} className="hover:bg-gray-50">
-                {headers.map((header, idx) => (
-                  <td
-                    key={idx}
-                    className="px-4 py-2 border border-gray-200 text-sm text-gray-700"
-                  >
-                    {row[header.toLowerCase().replace(/ /g, "_")]}
-                  </td>
-                ))}
-                {actions && (
-                  <td className="px-4 py-2 border border-gray-200">
-                    {actions.map((action, idx) => (
-                      <button
-                        key={idx}
-                        className={`px-3 py-1 mx-1 text-sm font-medium rounded ${action.color}`}
-                        onClick={() => action.onClick(row)}
-                      >
-                        {action.label}
-                      </button>
-                    ))}
-                  </td>
-                )}
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={
+                    headers.length + (actions && actions.length > 0 ? 1 : 0)
+                  }
+                  className="px-4 py-2 text-center text-sm text-gray-600"
+                >
+                  Nenhum dado
+                </td>
               </tr>
-            ))}
+            ) : (
+              data.map((row, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  {headers.map((header, idx) => (
+                    <td
+                      key={idx}
+                      className="px-4 py-2 border border-gray-200 text-sm text-gray-700"
+                    >
+                      {row[header.toLowerCase().replace(/ /g, "_")]}
+                    </td>
+                  ))}
+                  {actions && actions.length > 0 && (
+                    <td className="px-4 py-2 border border-gray-200">
+                      {actions.map((action, idx) => (
+                        <button
+                          key={idx}
+                          className={`px-3 py-1 mx-1 text-sm font-medium rounded ${action.color}`}
+                          onClick={() => action.onClick(row)}
+                        >
+                          {action.label}
+                        </button>
+                      ))}
+                    </td>
+                  )}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

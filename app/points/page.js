@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
 import Tab from "../components/Tab";
 import Table from "../components/Table";
 import MessageBox from "../components/MessageBox";
 import NotAuthorized from "../components/NotAuthorized";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { fetchPrivateData } from "../utils/api"; // Função de requisição
+import { fetchPrivateData, postPrivateData } from "../utils/api";
 import { useAuth } from "../providers/AuthProvider";
-import PontuacaoForm from "../components/PontuacaoForm"; // Importando o formulário
-
-import { postPrivateData } from "../utils/api";
+import PontuacaoForm from "../components/PontuacaoForm";
 import { isFromCategory } from "../utils/role";
 
 // Cores para cada senso
@@ -23,19 +22,15 @@ const SENSE_COLORS = {
 };
 
 const PointsPage = () => {
+  const { user, isLoading, getToken } = useAuth();
   const [groupedRules, setGroupedRules] = useState({});
   const [activeTab, setActiveTab] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
-  const { user, isLoading, getToken } = useAuth();
-  const [isReady, setIsReady] = useState(false);
-  const token = getToken(); // Obtém o token do usuário logado.
-
-  const [pontuacoes, setPontuacoes] = useState([]);
+  const [messages, setMessages] = useState({ error: null, success: null });
+  const [pontuacoes, setPontuacoes] = useState({});
   const [filteredPontuacoes, setFilteredPontuacoes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const token = getToken();
   const itemsPerPage = 10;
 
   const fetchPontuacoes = async () => {
@@ -44,116 +39,36 @@ const PointsPage = () => {
         "pontuacao/pontuacaoPorServidor",
         token
       );
-
-      // Agrupar as pontuações por senso
       const groupedBySenso = data.reduce((acc, pontuacao) => {
         const senso = pontuacao.regra.senso.descricao || "Sem Senso";
-        if (!acc[senso]) acc[senso] = [];
-        acc[senso].push(pontuacao);
+        acc[senso] = acc[senso] ? [...acc[senso], pontuacao] : [pontuacao];
         return acc;
       }, {});
-
-      console.log(groupedBySenso);
-
       setPontuacoes(groupedBySenso);
-      setTotalPages(Math.ceil(data.length / 10)); // Ajuste conforme a quantidade de dados por página
-
-      // Filtra inicialmente pela pesquisa
-      filterPontuacoes(searchTerm);
     } catch (error) {
-      setErrorMessage(
-        "Erro ao carregar pontuações: " + error.response.data?.errors[0]
-      );
+      setMessages({
+        error:
+          "Erro ao carregar pontuações: " + error?.response?.data?.errors[0],
+      });
     }
   };
 
-  // Função para filtrar as pontuações com base no nome da turma
-  const filterPontuacoes = (search) => {
-    setSearchTerm(search);
-    const filtered = pontuacoes[activeTab]?.filter((pontuacao) =>
-      pontuacao.turma.nome.toLowerCase().includes(search.toLowerCase())
-    );
-    setFilteredPontuacoes(filtered);
-
-    if (filtered?.length > 0) {
-      setTotalPages(Math.ceil(filtered.length / itemsPerPage)); // Atualiza totalPages com o filtro aplicado
+  const fetchRules = async () => {
+    try {
+      const data = await fetchPrivateData("regras/permitidas", token);
+      const grouped = data.reduce((acc, rule) => {
+        const senso = rule.senso?.descricao || "Sem Senso";
+        acc[senso] = acc[senso] ? [...acc[senso], rule] : [rule];
+        return acc;
+      }, {});
+      setGroupedRules(grouped);
+      setActiveTab(Object.keys(grouped)[0] || null);
+    } catch (error) {
+      setMessages({
+        error: "Erro ao carregar regras: " + error?.response?.data?.errors[0],
+      });
     }
   };
-
-  // Chamada do fetch quando o componente é carregado ou quando a aba ativa muda
-  useEffect(() => {
-    if (user && isReady) {
-      fetchPontuacoes();
-    }
-  }, [user, isReady, activeTab]);
-
-  useEffect(() => {
-    filterPontuacoes(searchTerm); // Atualiza o filtro sempre que o searchTerm mudar
-  }, [pontuacoes, activeTab]);
-
-  // Função de mudança de página
-  const onPageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-    }
-  };
-
-  // Busca as regras permitidas para o usuário
-  useEffect(() => {
-    const fetchRules = async () => {
-      try {
-        const data = await fetchPrivateData("regras/permitidas", token);
-
-        // Agrupa as regras por senso
-        const grouped = data.reduce((acc, rule) => {
-          const senso = rule.senso?.descricao || "Sem Senso";
-          if (!acc[senso]) acc[senso] = [];
-          acc[senso].push(rule);
-          return acc;
-        }, {});
-        setGroupedRules(grouped);
-
-        // Define a aba ativa como a primeira
-        if (Object.keys(grouped).length > 0) {
-          setActiveTab(Object.keys(grouped)[0]);
-        }
-      } catch (error) {
-        setErrorMessage(
-          "Erro ao carregar regras: " + error.response.data.errors[0]
-        );
-      }
-    };
-
-    if (
-      user !== null &&
-      !(!isFromCategory(user, "Admin") && !isFromCategory(user, "Aval"))
-    )
-      fetchRules();
-  }, [token, user]);
-
-  useEffect(() => {
-    // Aguarda o carregamento do usuário
-    if (!isLoading) {
-      setIsReady(true);
-    }
-  }, [isLoading]);
-
-  useEffect(() => {
-    if (Object.keys(groupedRules).length > 0) {
-      setActiveTab(Object.keys(groupedRules)[0]);
-    }
-  }, [groupedRules]);
-
-  // Enquanto estiver carregando, exibe o LoadingSpinner
-  if (!isReady) return <LoadingSpinner />;
-
-  if (user === null) return <NotAuthorized />;
-
-  if (
-    user === null ||
-    (!isFromCategory(user, "Admin") && !isFromCategory(user, "Aval"))
-  )
-    return <NotAuthorized />;
 
   const handleSubmit = async (
     formData,
@@ -161,13 +76,9 @@ const PointsPage = () => {
     setTipoRegra,
     setOperacao
   ) => {
-    // Verificar se o token está presente
-    if (!token) {
-      setErrorMessage("Token de autenticação não encontrado");
-      return;
-    }
+    if (!token)
+      return setMessages({ error: "Token de autenticação não encontrado" });
 
-    // Criar um objeto com os dados de formData que serão enviados
     const dataToSend = {
       id_turma: formData.idTurma,
       id_regra: formData.idRegra,
@@ -178,34 +89,25 @@ const PointsPage = () => {
       turno: formData.turno,
     };
 
-    // Chamar o método para enviar os dados
     try {
-      const response = await postPrivateData(
-        "pontuacao/lancar", // Endpoint onde a pontuação será lançada
-        dataToSend, // Dados do formulário
-        token // Token de autenticação
-      );
-
-      setSuccessMessage("Pontuação lançada com sucesso");
-
+      await postPrivateData("pontuacao/lancar", dataToSend, token);
+      setMessages({ success: "Pontuação lançada com sucesso" });
       setFormData({
         idTurma: "",
         idRegra: "",
         pontos: "",
-        operacao: "",
         motivacao: "",
         matriculaAluno: "",
         bimestre: 0,
         turno: "",
       });
-
       setTipoRegra(null);
       setOperacao(null);
       fetchPontuacoes();
     } catch (error) {
-      setErrorMessage(
-        "Erro ao enviar pontuação: " + error.response.data.errors[0]
-      );
+      setMessages({
+        error: "Erro ao enviar pontuação: " + error?.response?.data?.errors[0],
+      });
     }
   };
 
@@ -215,21 +117,55 @@ const PointsPage = () => {
     setCurrentPage(1);
   };
 
+  const filterPontuacoes = (search) => {
+    setSearchTerm(search);
+    const filtered = pontuacoes[activeTab]?.filter((pontuacao) =>
+      pontuacao.turma.nome.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredPontuacoes(filtered);
+  };
+
+  const onPageChange = (newPage) => {
+    if (
+      newPage >= 1 &&
+      newPage <= Math.ceil(filteredPontuacoes.length / itemsPerPage)
+    ) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  useEffect(() => {
+    if (user && !isLoading) {
+      fetchRules();
+      fetchPontuacoes();
+    }
+  }, [user, isLoading, token]);
+
+  useEffect(() => {
+    filterPontuacoes(searchTerm);
+  }, [pontuacoes, activeTab]);
+
+  if (isLoading) return <LoadingSpinner />;
+  if (
+    !user ||
+    (!isFromCategory(user, "Admin") && !isFromCategory(user, "Aval"))
+  )
+    return <NotAuthorized />;
+
   return (
     <div className="container mx-auto p-4">
-      {errorMessage && (
+      {messages.error && (
         <MessageBox
-          message={errorMessage}
+          message={messages.error}
           color="detail-minor"
-          onClose={() => setErrorMessage(null)}
+          onClose={() => setMessages({ ...messages, error: null })}
         />
       )}
-
-      {successMessage && (
+      {messages.success && (
         <MessageBox
-          message={successMessage}
+          message={messages.success}
           color="lime-400"
-          onClose={() => setSuccessMessage(null)}
+          onClose={() => setMessages({ ...messages, success: null })}
         />
       )}
 
@@ -257,10 +193,9 @@ const PointsPage = () => {
           </h2>
           <PontuacaoForm
             onSubmit={handleSubmit}
-            key={activeTab} // Força re-renderização ao mudar de aba
+            key={activeTab}
             regrasDisponiveis={groupedRules[activeTab]}
           />
-
           <h2
             className="text-xl font-semibold my-8"
             style={{ color: SENSE_COLORS[activeTab] }}
@@ -276,16 +211,17 @@ const PointsPage = () => {
               "Pontos",
               "Aplicado",
               "Anulado",
+              "Registrado Em",
             ]}
             data={
-              (filteredPontuacoes && filterPontuacoes.length) > 0
+              filteredPontuacoes && filteredPontuacoes.length > 0
                 ? filteredPontuacoes
                     .slice(
                       (currentPage - 1) * itemsPerPage,
                       currentPage * itemsPerPage
                     )
                     .map((pontuacao) => ({
-                      nome_da_turma: pontuacao.nomeTurma,
+                      nome_da_turma: pontuacao.turma.nome,
                       regra: pontuacao.regra.descricao,
                       operacao:
                         pontuacao.operacao === "SUM" ? "Adição" : "Subtração",
@@ -293,12 +229,20 @@ const PointsPage = () => {
                       contador: pontuacao.contador,
                       aplicado: pontuacao.aplicado ? "Verdadeiro" : "Falso",
                       anulado: pontuacao.anulado ? "Verdadeiro" : "Falso",
+                      registrado_em: format(
+                        new Date(pontuacao.createdAt),
+                        "dd/MM/yyyy HH:mm:ss"
+                      ),
                     }))
                 : []
             }
             actions={[]}
             page={currentPage}
-            totalPages={totalPages}
+            totalPages={
+              filteredPontuacoes && filteredPontuacoes.length > 0
+                ? Math.ceil(filteredPontuacoes.length / itemsPerPage)
+                : 1
+            }
             onPageChange={onPageChange}
             searchValue={searchTerm}
             onSearch={filterPontuacoes}

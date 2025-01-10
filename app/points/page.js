@@ -7,6 +7,7 @@ import Table from "../components/Table";
 import MessageBox from "../components/MessageBox";
 import NotAuthorized from "../components/NotAuthorized";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Modal from "../components/Modal";
 import { fetchPrivateData, postPrivateData } from "../utils/api";
 import { useAuth } from "../providers/AuthProvider";
 import PontuacaoForm from "../components/PontuacaoForm";
@@ -23,6 +24,8 @@ const SENSE_COLORS = {
 
 const PointsPage = () => {
   const { user, isLoading, getToken } = useAuth();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingPoint, setDeletingPoint] = useState(null);
   const [groupedRules, setGroupedRules] = useState({});
   const [activeTab, setActiveTab] = useState(null);
   const [messages, setMessages] = useState({ error: null, success: null });
@@ -115,6 +118,33 @@ const PointsPage = () => {
     setActiveTab(tab);
     setSearchTerm("");
     setCurrentPage(1);
+  };
+
+  const handleDelete = (pontuacao) => {
+    setDeletingPoint(pontuacao);
+    setDeleteModalOpen(true);
+  };
+
+  const deletePoints = async () => {
+    if (!token)
+      return setMessages({ error: "Token de autenticação não encontrado" });
+
+    const dataToSend = {
+      id_turma: deletingPoint.id_turma,
+      contador: deletingPoint.contador,
+    };
+
+    try {
+      await postPrivateData("pontuacao/deletarPontuacao", dataToSend, token);
+      setMessages({ success: "Pontuação deletada com sucesso" });
+      fetchPontuacoes();
+      setDeleteModalOpen(false);
+      setDeletingPoint(null);
+    } catch (error) {
+      setMessages({
+        error: "Erro ao deletar pontuacao: " + error?.response?.data?.errors[0],
+      });
+    }
   };
 
   const filterPontuacoes = (search) => {
@@ -233,10 +263,13 @@ const PointsPage = () => {
                         new Date(pontuacao.createdAt),
                         "dd/MM/yyyy HH:mm:ss"
                       ),
+                      id_turma: pontuacao.idTurma,
                     }))
                 : []
             }
-            actions={[]}
+            actions={[
+              { label: "Deletar", color: "bg-red-500", onClick: handleDelete },
+            ]}
             page={currentPage}
             totalPages={
               filteredPontuacoes && filteredPontuacoes.length > 0
@@ -249,6 +282,15 @@ const PointsPage = () => {
           />
         </div>
       )}
+
+      <Modal
+        title={"Deletar Pontuação"}
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onSave={deletePoints}
+      >
+        <p>Tem certeza que deseja deletar essa pontuação?</p>
+      </Modal>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import Navbar from "./Navbar";
 import MobileNavbar from "./MobileNavbar";
+import Link from "next/link";
 import { useAuth } from "../providers/AuthProvider";
 
 const Header = () => {

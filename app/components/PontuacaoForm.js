@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { fetchPrivateData } from "../utils/api";
 import { useAuth } from "../providers/AuthProvider";
 
-const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
+const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
   const { getToken } = useAuth();
   const [regras, setRegras] = useState(regrasDisponiveis || []);
   const [operacao, setOperacao] = useState(null);
@@ -32,7 +32,9 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit }) => {
         );
         setTurmas(data);
       } catch (error) {
-        setError("Erro ao carregar turmas: " + error.response.data.errors[0]);
+        setErrorMessage({
+          error: "Erro ao carregar turmas: " + error?.response?.data?.errors[0],
+        });
       }
     };
     fetchTurmas();

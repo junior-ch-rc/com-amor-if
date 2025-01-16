@@ -45,27 +45,35 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
           <ul>
             <li>
               <Link
-                href="#ranking"
+                href="/"
+                className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/#ranking"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
                 Ranking
               </Link>
             </li>
             <li>
-              <a
-                href="#about"
+              <Link
+                href="/#about"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
                 Sobre
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#regiment"
+              <Link
+                href="/#regiment"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
                 Regulamento
-              </a>
+              </Link>
             </li>
             {!isLoggedIn ? (
               <li>
@@ -96,6 +104,14 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
                         Anos Letivos
                       </a>
                     </li>
+                    <li>
+                      <a
+                        href="/validate"
+                        className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
+                      >
+                        Validar Pontos
+                      </a>
+                    </li>
                   </>
                 )}
                 {isFromCategory(user, "Aval") ||
@@ -107,7 +123,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
                           href="/points"
                           className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
                         >
-                          Pontos
+                          Lançar Pontos
                         </a>
                       </li>
                     </>

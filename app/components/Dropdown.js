@@ -62,6 +62,14 @@ const Dropdown = ({ username }) => {
                   Anos
                 </a>
               </li>
+              <li>
+                <a
+                  href="/validate"
+                  className="block py-1 px-4 hover:bg-gray-200 transition duration-200 ease-in-out"
+                >
+                  Validar Pontos
+                </a>
+              </li>
             </>
           )}
           {(isFromCategory(user, "Aval") || isFromCategory(user, "Admin")) && (

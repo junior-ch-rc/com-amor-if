@@ -222,6 +222,7 @@ const PointsPage = () => {
             {activeTab}
           </h2>
           <PontuacaoForm
+            setErrorMessage={setMessages}
             onSubmit={handleSubmit}
             key={activeTab}
             regrasDisponiveis={groupedRules[activeTab]}

@@ -71,7 +71,7 @@ const Table = ({
                       {actions.map((action, idx) => (
                         <button
                           key={idx}
-                          className={`px-3 py-1 mx-1 text-sm font-medium rounded ${action.color}`}
+                          className={`px-3 py-1 m-1 text-sm font-medium rounded ${action.color}`}
                           onClick={() => action.onClick(row)}
                         >
                           {action.label}

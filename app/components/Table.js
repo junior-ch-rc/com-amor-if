@@ -9,6 +9,7 @@ const Table = ({
   onPageChange,
   searchValue,
   onSearch,
+  searchText = "Buscar...",
 }) => {
   return (
     <div>
@@ -16,7 +17,7 @@ const Table = ({
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder={searchText}
           value={searchValue}
           onChange={(e) => onSearch(e.target.value)}
           className="w-full px-4 py-2 border rounded shadow-sm"

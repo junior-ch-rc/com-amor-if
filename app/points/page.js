@@ -235,6 +235,7 @@ const PointsPage = () => {
           </h2>
 
           <Table
+            searchText="Buscar pelo nome da turma..."
             headers={[
               "Nome da Turma",
               "Regra",

@@ -121,6 +121,33 @@ const PointsValidationPage = () => {
     }
   };
 
+  const handleApplyAll = async () => {
+    if (!token)
+      return setMessages({ error: "Token de autenticação não encontrado" });
+
+    console.log(pointsData);
+
+    const dataToSend = pointsData.map((point) => ({
+      contador: point.contador,
+      id_turma: point.idTurma,
+    }));
+
+    try {
+      await postPrivateData("manager/aprovarTodas", dataToSend, token);
+      setMessages({ success: "Pontuações aplicadas com sucesso" });
+
+      console.log(tabs.find((tab) => tab.label === activeTab).endpoint);
+
+      fetchPoints(tabs.find((tab) => tab.label === activeTab).endpoint);
+      setDeleteModalOpen(false);
+      setDeletingPoint(null);
+    } catch (error) {
+      setMessages({
+        error: "Erro ao aplicar pontuacao: " + error?.response?.data?.errors[0],
+      });
+    }
+  };
+
   const handleApply = async (point) => {
     if (!token)
       return setMessages({ error: "Token de autenticação não encontrado" });
@@ -206,8 +233,21 @@ const PointsValidationPage = () => {
 
       <br></br>
 
+      {activeTab === "Pontos a Validar" && (
+        <>
+          <button
+            key="aplicarTudo"
+            className={`px-4 py-2 m-1 mb-6 text-md font-medium rounded bg-green-500`}
+            onClick={handleApplyAll}
+          >
+            Aplicar todos os pontos a validar
+          </button>
+        </>
+      )}
+
       {/* Tabela com Paginação e Ações Dinâmicas */}
       <Table
+        searchText="Buscar pelo nome da turma..."
         headers={[
           "Nome da Turma",
           "Regra",

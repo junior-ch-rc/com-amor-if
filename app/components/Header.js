@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import Navbar from "./Navbar";
 import MobileNavbar from "./MobileNavbar";
-import Link from "next/link";
+import HomeLink from "./HomeLink";
 import { useAuth } from "../providers/AuthProvider";
 
 const Header = () => {
@@ -17,7 +17,7 @@ const Header = () => {
     <header id="home" className="bg-primary text-white shadow-md">
       <div className="container mx-auto p-4 flex justify-between items-center">
         {/* Logo */}
-        <div className="text-2xl font-bold">Com Amor, IF</div>
+        <HomeLink />
 
         {/* Navbar */}
         <Navbar isLoggedIn={!!user?.username} username={user?.username || ""} />

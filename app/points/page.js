@@ -23,7 +23,7 @@ const SENSE_COLORS = {
 };
 
 const PointsPage = () => {
-  const { user, isLoading, getToken } = useAuth();
+  const { user, isLoading, getToken, isLoggingOut } = useAuth();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingPoint, setDeletingPoint] = useState(null);
   const [groupedRules, setGroupedRules] = useState({});
@@ -175,7 +175,7 @@ const PointsPage = () => {
     filterPontuacoes(searchTerm);
   }, [pontuacoes, activeTab]);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading || isLoggingOut) return <LoadingSpinner />;
   if (
     !user ||
     (!isFromCategory(user, "Admin") && !isFromCategory(user, "Aval"))

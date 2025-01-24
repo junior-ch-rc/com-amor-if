@@ -23,7 +23,7 @@ const GroupManagement = () => {
   });
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const { getToken } = useAuth();
+  const { getToken, isLoggingOut } = useAuth();
   const itemsPerPage = 10;
   const [errorMessage, setErrorMessage] = useState(null);
   const { user, isLoading } = useAuth();
@@ -40,7 +40,9 @@ const GroupManagement = () => {
           setTurmas(data);
           setFilteredTurmas(data);
         } catch (error) {
-          setErrorMessage("Erro ao buscar turmas: " + error.response.data.errors[0]);
+          setErrorMessage(
+            "Erro ao buscar turmas: " + error.response.data.errors[0]
+          );
         }
       }
     };
@@ -56,7 +58,9 @@ const GroupManagement = () => {
           setYears(openYears);
           setFilteredYears(openYears);
         } catch (error) {
-          setErrorMessage("Erro ao buscar anos letivos: " + error.response.data.errors[0]);
+          setErrorMessage(
+            "Erro ao buscar anos letivos: " + error.response.data.errors[0]
+          );
         }
       }
     };
@@ -119,7 +123,7 @@ const GroupManagement = () => {
     }
   }, [isLoading]);
 
-  if (!isReady) return <LoadingSpinner />;
+  if (!isReady || isLoggingOut) return <LoadingSpinner />;
   if (user === null || !isFromCategory(user, "Admin")) return <NotAuthorized />;
 
   return (

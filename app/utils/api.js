@@ -4,15 +4,15 @@ const API_URL = process.env.NEXT_PUBLIC_REACT_APP_API_URL;
 
 const api = axios.create();
 
-// api.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response?.status === 403) {
-//       window.location.reload(); // Atualiza a página
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      window.location.reload(); // Atualiza a página
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const fetchPrivateData = async (call, token, attributes) => {
   try {

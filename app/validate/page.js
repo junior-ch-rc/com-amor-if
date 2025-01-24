@@ -37,7 +37,7 @@ const TABS_COLORS = {
 const itemsPerPage = 10;
 
 const PointsValidationPage = () => {
-  const { user, isLoading, getToken } = useAuth();
+  const { user, isLoading, getToken, isLoggingOut } = useAuth();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingPoint, setDeletingPoint] = useState(null);
   const [activeTab, setActiveTab] = useState(tabs[0].label);
@@ -49,8 +49,10 @@ const PointsValidationPage = () => {
 
   const fetchPoints = async (endpoint) => {
     try {
-      const data = await fetchPrivateData(endpoint, token);
-      setPointsData(data);
+      if (user) {
+        const data = await fetchPrivateData(endpoint, token);
+        setPointsData(data);
+      }
     } catch (error) {
       setMessages({
         error: "Erro ao carregar dados: " + error?.response?.data?.errors[0],
@@ -63,7 +65,7 @@ const PointsValidationPage = () => {
     if (defaultTab) fetchPoints(defaultTab.endpoint);
   }, [activeTab, token]);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading || isLoggingOut) return <LoadingSpinner />;
   if (!user) return <NotAuthorized />;
 
   // Função para definir as ações conforme a aba ativa
@@ -224,12 +226,14 @@ const PointsValidationPage = () => {
       <h1 className="text-2xl font-bold mb-4">Validação de Pontuações</h1>
 
       {/* Componente de Abas */}
-      <Tab
-        tabs={tabs.map((tab) => tab.label)}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        tabColors={TABS_COLORS}
-      />
+      <div className="overflow-x-auto flex flex-nowrap gap-2 border-b border-gray-300 mb-4">
+        <Tab
+          tabs={tabs.map((tab) => tab.label)}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          tabColors={TABS_COLORS}
+        />
+      </div>
 
       <br></br>
 

@@ -19,7 +19,7 @@ const AcademicYearManagement = () => {
   const [formData, setFormData] = useState({ ano_letivo: "", aberto: false });
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const { getToken } = useAuth();
+  const { getToken, isLoggingOut } = useAuth();
   const itemsPerPage = 10;
   const [errorMessage, setErrorMessage] = useState(null); // Armazena o erro para exibir
   const { user, isLoading } = useAuth(); // Supondo que você tem um estado isLoading
@@ -114,7 +114,7 @@ const AcademicYearManagement = () => {
   }, [isLoading]); // Só vai rodar quando o isLoading mudar
 
   // Enquanto estiver carregando, exibe o LoadingSpinner
-  if (!isReady) return <LoadingSpinner />;
+  if (!isReady || isLoggingOut) return <LoadingSpinner />;
 
   if (user === null || !isFromCategory(user, "Admin")) return <NotAuthorized />;
 

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const AuthContext = createContext(null);
 
@@ -20,6 +20,8 @@ export const AuthProvider = ({ children }) => {
   ]);
 
   const [user, setUser] = useState(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(true); // Estado para controle de carregamento
 
   // Função para obter usuário atual
@@ -49,6 +51,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    if (user === null && pathname === "/") {
+      setIsLoggingOut(false);
+    }
+
     const initializeUser = async () => {
       // Só chama getCurrentUser se o usuário ainda não estiver carregado
       if (!user?.username && cookies.access_token) {
@@ -63,7 +69,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     initializeUser();
-  }, [cookies.access_token, user?.username]); // Chama quando o token ou usuário mudam
+  }, [cookies.access_token, user?.username, user, pathname]); // Chama quando o token ou usuário mudam
 
   // Função de login
   const login = async (code) => {
@@ -85,7 +91,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Função de logout
-  const logout = () => {
+  const logout = async () => {
+    setIsLoggingOut(true);
     removeCookie("access_token");
     removeCookie("refresh_token");
     removeCookie("roles");
@@ -107,6 +114,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         getCurrentUser,
         isLoading,
+        isLoggingOut,
       }}
     >
       {children}

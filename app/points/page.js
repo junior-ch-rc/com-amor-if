@@ -280,7 +280,10 @@ const PointsPage = () => {
             }
             onPageChange={onPageChange}
             searchValue={searchTerm}
-            onSearch={filterPontuacoes}
+            onSearch={(value) => {
+              setCurrentPage(1);
+              filterPontuacoes(value);
+            }}
           />
         </div>
       )}

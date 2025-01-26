@@ -254,6 +254,7 @@ const PointsValidationPage = () => {
         searchText="Buscar pelo nome da turma..."
         headers={[
           "Nome da Turma",
+          "Bimestre",
           "Regra",
           "Operacao",
           "Pontos",
@@ -266,6 +267,7 @@ const PointsValidationPage = () => {
           .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
           .map((pontuacao) => ({
             nome_da_turma: pontuacao.turma.nome,
+            bimestre: pontuacao.bimestre,
             contador: pontuacao.contador,
             id_turma: pontuacao.turma.id,
             regra: pontuacao.regra.descricao,
@@ -288,7 +290,10 @@ const PointsValidationPage = () => {
         }
         onPageChange={onPageChange}
         searchValue={searchTerm}
-        onSearch={setSearchTerm}
+        onSearch={(value) => {
+          setCurrentPage(1);
+          setSearchTerm(value);
+        }}
       />
 
       <Modal

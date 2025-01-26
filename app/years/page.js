@@ -155,7 +155,10 @@ const AcademicYearManagement = () => {
         totalPages={totalPages}
         onPageChange={setPage}
         searchValue={search}
-        onSearch={setSearch}
+        onSearch={(value) => {
+          setPage(1);
+          setSearch(value);
+        }}
       />
 
       <Modal

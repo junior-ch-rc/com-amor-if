@@ -54,13 +54,21 @@ const ReportsPage = () => {
   }, []);
 
   useEffect(() => {
-    // Atribuindo cores fixas para cada turma
-    const colorMap = turmas.reduce((acc, turma, index) => {
-      const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-      acc[turma.id] = color;
-      return acc;
-    }, {});
-    setTurmasColors(colorMap);
+    const generateColor = () => {
+      while (true) {
+        const color = `#${Math.random().toString(16).slice(2, 8)}`;
+        const [r, g, b] = color.match(/\w\w/g).map((c) => parseInt(c, 16));
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        if (brightness >= 50 && brightness <= 200) return color;
+      }
+    };
+
+    setTurmasColors(
+      turmas.reduce(
+        (acc, { nome }) => ({ ...acc, [nome]: generateColor() }),
+        {}
+      )
+    );
   }, [turmas]);
 
   if (loading) return <LoadingSpinner />;
@@ -69,71 +77,39 @@ const ReportsPage = () => {
   // Cálculo de métricas
   const turmasPontuacao = {};
   const sensoPontuacao = {};
-  const turmasPorMes = {}; // Para o gráfico de linha (por mês)
 
   pontuacoes.forEach((p) => {
-    const { idTurma, nomeTurma, pontos, regra, operacao, createdAt } = p;
+    const { idTurma, nomeTurma, pontos, regra, operacao, bimestre } = p;
     const senso = regra.senso.descricao;
 
-    // Atualizar o total de pontos por turma
     if (!turmasPontuacao[idTurma]) {
-      turmasPontuacao[idTurma] = { nome: nomeTurma, total: 0, meses: {} };
+      turmasPontuacao[idTurma] = { nome: nomeTurma, total: 0, bimestres: {} };
     }
 
     turmasPontuacao[idTurma].total += operacao === "SUM" ? pontos : -pontos;
 
-    // Para o gráfico de linha (agrupar por mês)
-    const date = new Date(createdAt);
-    const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
-    turmasPontuacao[idTurma].meses[monthYear] =
-      (turmasPontuacao[idTurma].meses[monthYear] || 0) +
+    // Utiliza diretamente o bimestre informado na pontuação
+    turmasPontuacao[idTurma].bimestres[bimestre] =
+      (turmasPontuacao[idTurma].bimestres[bimestre] || 0) +
       (operacao === "SUM" ? pontos : -pontos);
 
-    // Atualizar a pontuação geral por senso
     if (!sensoPontuacao[senso]) sensoPontuacao[senso] = 0;
     sensoPontuacao[senso] += operacao === "SUM" ? pontos : -pontos;
   });
 
-  // Garantir que todas as turmas apareçam, mesmo com pontuação 0
+  // Garantir que todas as turmas apareçam no relatório, mesmo sem pontuação
   turmas.forEach((turma) => {
     if (!turmasPontuacao[turma.id]) {
-      turmasPontuacao[turma.id] = { nome: turma.nome, total: 0, meses: {} };
+      turmasPontuacao[turma.id] = { nome: turma.nome, total: 0, bimestres: {} };
     }
   });
 
-  // Organizar dados para gráficos
+  // Organizar dados para os gráficos
   const turmasArray = Object.values(turmasPontuacao);
   const sensoArray = Object.entries(sensoPontuacao).map(([senso, total]) => ({
     senso,
     total,
   }));
-
-  // Dados para gráficos
-  const chartData = turmasArray.map((t) => ({
-    name: t.nome,
-    pontuacao: t.total,
-  }));
-
-  const radarData = sensoArray.map((s) => ({
-    senso: s.senso,
-    Pontuação: s.total,
-  }));
-
-  // Dados para gráfico de linha (pontuação por mês de cada turma)
-  const lineChartData = turmasArray.map((t) => {
-    const meses = Object.keys(t.meses).sort((a, b) => {
-      const [monthA, yearA] = a.split("/");
-      const [monthB, yearB] = b.split("/");
-      return new Date(yearA, monthA - 1) - new Date(yearB, monthB - 1);
-    });
-
-    const pontosPorMes = meses.map((mes) => ({
-      date: mes,
-      pontos: t.meses[mes] || 0, // Adicionando o ponto zero se não houver pontuação
-    }));
-
-    return { name: t.nome, data: pontosPorMes };
-  });
 
   const sensoMaisPontuado = sensoArray.sort((a, b) => b.total - a.total)[0];
   const sensoMenosPontuado = sensoArray.sort((a, b) => a.total - b.total)[0];
@@ -141,6 +117,10 @@ const ReportsPage = () => {
   const filteredData = pontuacoes.filter((p) =>
     p.nomeTurma.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -163,23 +143,27 @@ const ReportsPage = () => {
       </div>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <div className="p-4 border rounded-lg bg-white">
           <TurmaBarChart
-            data={chartData}
-            colors={turmasColors}
+            turmasArray={turmasArray}
             title="Pontuação das Turmas"
           />
         </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div className="p-4 border rounded-lg bg-white">
           <PontuacaoEvolucaoChart
-            data={lineChartData}
             colors={turmasColors}
+            turmasArray={turmasArray}
             title="Evolução da Pontuação"
           />
         </div>
         <div className="p-4 border rounded-lg bg-white">
-          <RadarSensoChart data={radarData} title="Desempenho por Senso" />
+          <RadarSensoChart
+            sensoArray={sensoArray}
+            title="Desempenho por Senso"
+          />
         </div>
       </div>
 
@@ -194,6 +178,8 @@ const ReportsPage = () => {
           "Regra",
           "Operacao",
           "Pontos",
+          "Aplicado",
+          "Anulado",
           "Registrado Em",
           "Criado Por",
           "Detalhes",
@@ -207,10 +193,32 @@ const ReportsPage = () => {
             senso: p.regra.senso.descricao,
             operacao: p.operacao === "SUM" ? "Adição" : "Subtração",
             pontos: p.pontos,
+            aplicado: p.aplicado ? "Verdadeiro" : "Falso",
+            anulado: p.anulado ? "Verdadeiro" : "Falso",
             data: format(new Date(p.createdAt), "dd/MM/yyyy"),
-            criadoPor: p.criadoPor.username,
-            detalhes: `/report/${p.idTurma}`,
+            criado_por: p.criadoPor.username,
+            registrado_em: format(new Date(p.createdAt), "dd/MM/yyyy HH:mm:ss"),
+            detalhes: (
+              <Link
+                href={`/reports/${p.idTurma}`}
+                className="text-blue-500 hover:underline"
+              >
+                Ver detalhes
+              </Link>
+            ),
           }))}
+        searchValue={searchTerm}
+        onSearch={(value) => {
+          setCurrentPage(1);
+          setSearchTerm(value);
+        }}
+        page={currentPage}
+        totalPages={
+          Math.ceil(filteredData.length / itemsPerPage) > 1
+            ? Math.ceil(filteredData.length / itemsPerPage)
+            : 1
+        }
+        onPageChange={onPageChange}
       />
     </div>
   );

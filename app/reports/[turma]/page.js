@@ -7,8 +7,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import MessageBox from "../../components/MessageBox";
 import Table from "../../components/Table";
 import {
-  PontuacaoPositivaBarChart,
-  PontuacaoNegativaBarChart,
+  PontuacaoBarChart,
   PontuacaoLineChart,
   PontuacaoRadarChart,
 } from "../../components/ReportCharts";
@@ -76,8 +75,7 @@ const ReportPage = () => {
         </h1>
         <MessageBox message="Não há dados para exibir" color="yellow" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <PontuacaoPositivaBarChart data={[]} title="Pontuação por Bimestre" />
-          <PontuacaoNegativaBarChart data={[]} title="Pontuação por Bimestre" />
+          <PontuacaoBarChart data={[]} title="Pontuação por Bimestre" />
           <PontuacaoLineChart data={[]} title="Evolução da Pontuação" />
           <PontuacaoRadarChart data={[]} title="Desempenho por Senso" />
         </div>
@@ -118,19 +116,16 @@ const ReportPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="p-4 border rounded-lg bg-white">
-          <PontuacaoPositivaBarChart
+          <PontuacaoBarChart
             data={data}
-            title="Pontuação Positiva por Bimestre"
+            title="Pontuação por Senso e Bimestre"
           />
         </div>
         <div className="p-4 border rounded-lg bg-white">
-          <PontuacaoNegativaBarChart
+          <PontuacaoLineChart
             data={data}
-            title="Pontuação Negativa por Bimestre"
+            title="Evolução da Pontuação por Bimestre"
           />
-        </div>
-        <div className="p-4 border rounded-lg bg-white">
-          <PontuacaoLineChart data={data} title="Evolução da Pontuação" />
         </div>
         <div className="p-4 border rounded-lg bg-white">
           <PontuacaoRadarChart data={data} title="Desempenho por Senso" />

@@ -73,6 +73,8 @@ export const PontuacaoEvolucaoChart = ({ colors, turmasArray }) => {
     return entry;
   });
 
+  console.log(turmasArray);
+
   return (
     <div className="p-4 border rounded-lg bg-white">
       <h2 className="text-lg font-semibold mb-2">
@@ -125,8 +127,8 @@ export const RadarSensoChart = ({ sensoArray }) => {
           <Radar
             name="Média"
             dataKey="Pontuação"
-            stroke="#FF5722"
-            fill="#FF5722"
+            stroke="#ffb536"
+            fill="#ffb536"
             fillOpacity={0.6}
           />
         </RadarChart>

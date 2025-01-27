@@ -1,3 +1,4 @@
+import React from "react";
 import {
   BarChart,
   LineChart,
@@ -23,15 +24,23 @@ const SENSE_COLORS = {
   Autodisciplina: "#ff8486",
 };
 
-export const PontuacaoBarChart = ({ data, title }) => {
-  // Organizar os dados por bimestre e senso
+export const PontuacaoPositivaBarChart = ({ data, title }) => {
+  // Organizar os dados por bimestre e separar os pontos positivos
   const formattedData = Object.values(
     data.reduce((acc, item) => {
-      const { bimestre, pontos, regra } = item;
+      const { bimestre, pontos, regra, operacao } = item;
       const senso = regra.senso.descricao;
 
+      // Verificar a operação para definir se os pontos são positivos ou negativos
+      const pontosCorrigidos = operacao === "SUB" ? -pontos : pontos;
+
       acc[bimestre] = acc[bimestre] || { bimestre };
-      acc[bimestre][senso] = (acc[bimestre][senso] || 0) + pontos;
+      acc[bimestre][`${senso}`] = acc[bimestre][`${senso}`] || 0;
+
+      // Adicionar pontos positivos
+      if (pontosCorrigidos > 0) {
+        acc[bimestre][`${senso}`] += pontosCorrigidos;
+      }
 
       return acc;
     }, {})
@@ -49,7 +58,52 @@ export const PontuacaoBarChart = ({ data, title }) => {
           {Object.keys(SENSE_COLORS).map((senso) => (
             <Bar
               key={senso}
-              dataKey={senso}
+              dataKey={`${senso}`}
+              fill={SENSE_COLORS[senso]}
+              stackId="a"
+            />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+export const PontuacaoNegativaBarChart = ({ data, title }) => {
+  // Organizar os dados por bimestre e separar os pontos negativos
+  const formattedData = Object.values(
+    data.reduce((acc, item) => {
+      const { bimestre, pontos, regra, operacao } = item;
+      const senso = regra.senso.descricao;
+
+      // Verificar a operação para definir se os pontos são positivos ou negativos
+      const pontosCorrigidos = operacao === "SUB" ? -pontos : pontos;
+
+      acc[bimestre] = acc[bimestre] || { bimestre };
+      acc[bimestre][`${senso}`] = acc[bimestre][`${senso}`] || 0;
+
+      // Adicionar pontos negativos
+      if (pontosCorrigidos < 0) {
+        acc[bimestre][`${senso}`] += pontosCorrigidos;
+      }
+
+      return acc;
+    }, {})
+  );
+
+  return (
+    <div className="bg-white p-4 shadow-md rounded-md">
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={formattedData}>
+          <XAxis dataKey="bimestre" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          {Object.keys(SENSE_COLORS).map((senso) => (
+            <Bar
+              key={senso}
+              dataKey={`${senso}`}
               fill={SENSE_COLORS[senso]}
               stackId="a"
             />
@@ -61,24 +115,21 @@ export const PontuacaoBarChart = ({ data, title }) => {
 };
 
 export const PontuacaoLineChart = ({ data, title }) => {
-  // Agrupar pontuações por mês/ano e senso
   const formattedData = Object.values(
     data.reduce((acc, item) => {
-      // Extrair o mês e ano para agrupar
       const date = new Date(item.createdAt);
-      const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`; // Ex: "01/2025"
+      const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
       const senso = item.regra.senso.descricao;
-      const pontos = item.pontos;
+      const pontosCorrigidos =
+        item.operacao === "SUB" ? -item.pontos : item.pontos;
 
-      // Acumular os pontos por mês e senso
       acc[monthYear] = acc[monthYear] || { date: monthYear };
-      acc[monthYear][senso] = (acc[monthYear][senso] || 0) + pontos;
+      acc[monthYear][senso] = (acc[monthYear][senso] || 0) + pontosCorrigidos;
 
       return acc;
     }, {})
   );
 
-  // Ordenar as datas (mês/ano) cronologicamente
   const sortedData = formattedData.sort((a, b) => {
     const [monthA, yearA] = a.date.split("/");
     const [monthB, yearB] = b.date.split("/");
@@ -110,26 +161,25 @@ export const PontuacaoLineChart = ({ data, title }) => {
 };
 
 export const PontuacaoRadarChart = ({ data, title }) => {
-  // Lista fixa de todos os sensos possíveis
   const SENSOS = [
     "Limpeza",
     "Saúde",
     "Utilização",
     "Ordenação",
     "Autodisciplina",
-  ]; // Ajuste conforme necessário
+  ];
 
-  // Agrupar pontuações por senso
   const pontosPorSenso = data.reduce((acc, item) => {
     const senso = item.regra.senso.descricao;
-    acc[senso] = (acc[senso] || 0) + item.pontos;
+    const pontosCorrigidos =
+      item.operacao === "SUB" ? -item.pontos : item.pontos;
+    acc[senso] = (acc[senso] || 0) + pontosCorrigidos;
     return acc;
   }, {});
 
-  // Criar os dados do radar: incluir todos os sensos, mesmo que zerados
   const radarData = SENSOS.map((senso) => ({
     senso,
-    pontos: pontosPorSenso[senso] || 0, // Se não tiver pontuação, manter 0
+    pontos: pontosPorSenso[senso],
   }));
 
   return (
@@ -139,6 +189,7 @@ export const PontuacaoRadarChart = ({ data, title }) => {
         <RadarChart data={radarData}>
           <PolarGrid />
           <PolarAngleAxis dataKey="senso" />
+          <PolarRadiusAxis />
           <Radar
             name="Pontuação"
             dataKey="pontos"

@@ -7,14 +7,15 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import MessageBox from "../../components/MessageBox";
 import Table from "../../components/Table";
 import {
-  PontuacaoBarChart,
+  PontuacaoPositivaBarChart,
+  PontuacaoNegativaBarChart,
   PontuacaoLineChart,
   PontuacaoRadarChart,
-} from "../../components/Charts";
+} from "../../components/ReportCharts";
 
 const apiUrl = process.env.NEXT_PUBLIC_REACT_APP_API_URL;
 
-const itemsPerPage = 2;
+const itemsPerPage = 10;
 
 const SENSE_COLORS = {
   Limpeza: "#18a08c",
@@ -65,7 +66,7 @@ const ReportPage = () => {
   }, [numeroDaTurma]);
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <MessageBox message={error} color="red" />;
+  if (error) return <MessageBox message={error} color="detail-minor" />;
 
   if (data.length === 0) {
     return (
@@ -74,8 +75,9 @@ const ReportPage = () => {
           Relatório da Turma {numeroDaTurma}
         </h1>
         <MessageBox message="Não há dados para exibir" color="yellow" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <PontuacaoBarChart data={[]} title="Pontuação por Bimestre" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <PontuacaoPositivaBarChart data={[]} title="Pontuação por Bimestre" />
+          <PontuacaoNegativaBarChart data={[]} title="Pontuação por Bimestre" />
           <PontuacaoLineChart data={[]} title="Evolução da Pontuação" />
           <PontuacaoRadarChart data={[]} title="Desempenho por Senso" />
         </div>
@@ -83,13 +85,13 @@ const ReportPage = () => {
     );
   }
 
-  const totalPontos = data.reduce((sum, item) => sum + item.pontos, 0);
   const positivos = data
-    .filter((item) => item.pontos > 0)
+    .filter((item) => item.operacao === "SUM")
     .reduce((sum, item) => sum + item.pontos, 0);
   const negativos = data
-    .filter((item) => item.pontos < 0)
+    .filter((item) => item.operacao === "SUB")
     .reduce((sum, item) => sum + item.pontos, 0);
+  const totalPontos = positivos - negativos;
 
   const filteredAllPoints = allData.filter((p) =>
     p.regra.descricao.toLowerCase().includes(searchTerm.toLowerCase())
@@ -114,9 +116,18 @@ const ReportPage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="p-4 border rounded-lg bg-white">
-          <PontuacaoBarChart data={data} title="Pontuação por Bimestre" />
+          <PontuacaoPositivaBarChart
+            data={data}
+            title="Pontuação Positiva por Bimestre"
+          />
+        </div>
+        <div className="p-4 border rounded-lg bg-white">
+          <PontuacaoNegativaBarChart
+            data={data}
+            title="Pontuação Negativa por Bimestre"
+          />
         </div>
         <div className="p-4 border rounded-lg bg-white">
           <PontuacaoLineChart data={data} title="Evolução da Pontuação" />
@@ -133,6 +144,7 @@ const ReportPage = () => {
         searchText="Buscar pela regra..."
         headers={[
           "Bimestre",
+          "Senso",
           "Regra",
           "Operacao",
           "Pontos",
@@ -147,6 +159,7 @@ const ReportPage = () => {
             bimestre: pontuacao.bimestre,
             contador: pontuacao.contador,
             id_turma: pontuacao.turma.id,
+            senso: pontuacao.regra.senso.descricao,
             regra: pontuacao.regra.descricao,
             operacao: pontuacao.operacao === "SUM" ? "Adição" : "Subtração",
             pontos: pontuacao.pontos,

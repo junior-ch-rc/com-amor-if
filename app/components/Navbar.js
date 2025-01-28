@@ -19,6 +19,12 @@ const Navbar = ({ isLoggedIn, username }) => {
         Home
       </Link>
       <Link
+        href="/reports"
+        className="hover:bg-primary-light px-4 py-2 rounded-lg transition duration-300 ease-in-out"
+      >
+        Relatórios
+      </Link>
+      <Link
         href="/#about"
         className="hover:bg-primary-light px-4 py-2 rounded-lg transition duration-300 ease-in-out"
       >

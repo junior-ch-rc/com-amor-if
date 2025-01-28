@@ -26,7 +26,7 @@ export const TurmaBarChart = ({ turmasArray }) => {
   return (
     <div className="p-4 border rounded-lg bg-white">
       <h2 className="text-lg font-semibold mb-2">Pontuação das Turmas</h2>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={400}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis

@@ -53,6 +53,14 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
             </li>
             <li>
               <Link
+                href="/reports"
+                className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
+              >
+                Relatórios
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/#ranking"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >

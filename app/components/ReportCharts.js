@@ -28,66 +28,54 @@ const SENSE_COLORS = {
 
 export const PontuacaoBarChart = ({ data, title }) => {
   // Organizar os dados por bimestre e acumular os pontos por senso
-  const formattedData = Object.values(
+  const allSensos = [
+    "Limpeza",
+    "Utilização",
+    "Autodisciplina",
+    "Saúde",
+    "Ordenação",
+  ];
+
+  const chartData = Object.values(
     data.reduce((acc, item) => {
       const { bimestre, pontos, regra, operacao } = item;
       const senso = regra.senso.descricao;
 
-      // Verificar a operação para definir se os pontos são positivos ou negativos
+      // Corrigir os pontos conforme a operação (adição ou subtração)
       const pontosCorrigidos = operacao === "SUB" ? -pontos : pontos;
 
-      // Inicializa o bimestre
-      acc[bimestre] = acc[bimestre] || { name: `${bimestre}` };
+      // Inicializa o bimestre se ainda não existir
+      if (!acc[bimestre]) {
+        acc[bimestre] = { name: `${bimestre}` };
 
-      // Acumula os pontos de cada senso
-      acc[bimestre][senso] = (acc[bimestre][senso] || 0) + pontosCorrigidos;
+        // Adiciona todos os sensos com pontuação 0 por padrão
+        allSensos.forEach((s) => {
+          acc[bimestre][s] = 0;
+        });
+      }
+
+      // Soma a pontuação correta para o senso correspondente
+      acc[bimestre][senso] += pontosCorrigidos;
 
       return acc;
     }, {})
   );
 
-  // Transformar o objeto de dados em um array para o gráfico
-  const chartData = Object.values(formattedData).map((item) => {
-    const finalItem = { ...item };
-    Object.keys(item).forEach((key) => {
-      // Zerar valores caso o senso não exista no bimestre
-      if (!item[key]) {
-        finalItem[key] = 0;
-      }
-    });
-    return finalItem;
-  });
-
-  console.log(formattedData);
+  console.log(chartData);
 
   return (
     <div className="bg-white p-4 shadow-md rounded-md">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={chartData}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart width={500} height={400} data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
           <Legend />
           <ReferenceLine y={0} stroke="#000" />
-
-          {/* Barra para cada senso */}
-          {formattedData.map((senso, index) => (
-            <Bar
-              key={index}
-              dataKey={senso.name} // Usando o nome do senso como dataKey
-              fill={SENSE_COLORS[senso]} // Cor para cada senso
-              stackId="a"
-            />
+          {allSensos.map((senso) => (
+            <Bar key={senso} dataKey={senso} fill={SENSE_COLORS[senso]} />
           ))}
         </BarChart>
       </ResponsiveContainer>

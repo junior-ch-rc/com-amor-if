@@ -114,13 +114,16 @@ const ReportPage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <div className="p-4 border rounded-lg bg-white">
           <PontuacaoBarChart
             data={data}
             title="Pontuação por Senso e Bimestre"
           />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="p-4 border rounded-lg bg-white">
           <PontuacaoLineChart
             data={data}

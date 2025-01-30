@@ -127,8 +127,6 @@ const PointsValidationPage = () => {
     if (!token)
       return setMessages({ error: "Token de autenticação não encontrado" });
 
-    console.log(pointsData);
-
     const dataToSend = pointsData.map((point) => ({
       contador: point.contador,
       id_turma: point.idTurma,
@@ -138,7 +136,7 @@ const PointsValidationPage = () => {
       await postPrivateData("manager/aprovarTodas", dataToSend, token);
       setMessages({ success: "Pontuações aplicadas com sucesso" });
 
-      console.log(tabs.find((tab) => tab.label === activeTab).endpoint);
+      //console.log(tabs.find((tab) => tab.label === activeTab).endpoint);
 
       fetchPoints(tabs.find((tab) => tab.label === activeTab).endpoint);
       setDeleteModalOpen(false);
@@ -163,7 +161,7 @@ const PointsValidationPage = () => {
       await postPrivateData("manager/aprovar", dataToSend, token);
       setMessages({ success: "Pontuação aplicada com sucesso" });
 
-      console.log(tabs.find((tab) => tab.label === activeTab).endpoint);
+      //console.log(tabs.find((tab) => tab.label === activeTab).endpoint);
 
       fetchPoints(tabs.find((tab) => tab.label === activeTab).endpoint);
       setDeleteModalOpen(false);

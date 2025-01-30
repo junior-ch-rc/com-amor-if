@@ -73,8 +73,6 @@ export const PontuacaoEvolucaoChart = ({ colors, turmasArray }) => {
     return entry;
   });
 
-  console.log(turmasArray);
-
   return (
     <div className="p-4 border rounded-lg bg-white">
       <h2 className="text-lg font-semibold mb-2">

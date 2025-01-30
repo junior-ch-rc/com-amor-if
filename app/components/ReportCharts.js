@@ -61,8 +61,6 @@ export const PontuacaoBarChart = ({ data, title }) => {
     }, {})
   );
 
-  console.log(chartData);
-
   return (
     <div className="bg-white p-4 shadow-md rounded-md">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>

@@ -14,7 +14,7 @@ import {
 
 const apiUrl = process.env.NEXT_PUBLIC_REACT_APP_API_URL;
 
-const itemsPerPage = 5;
+const itemsPerPage = 10;
 
 const ReportsPage = () => {
   const [loading, setLoading] = useState(true);
@@ -200,7 +200,7 @@ const ReportsPage = () => {
             registrado_em: format(new Date(p.createdAt), "dd/MM/yyyy HH:mm:ss"),
             detalhes: (
               <Link
-                href={`/reports/${p.idTurma}`}
+                href={`/reports/${p.idTurma}?nome=${p.nomeTurma}`}
                 className="text-blue-500 hover:underline"
               >
                 Ver detalhes

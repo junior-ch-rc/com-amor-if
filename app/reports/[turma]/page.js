@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { format } from "date-fns";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import MessageBox from "../../components/MessageBox";
@@ -27,6 +27,8 @@ const SENSE_COLORS = {
 const ReportPage = () => {
   const params = useParams();
   const numeroDaTurma = params["turma"];
+  const searchParams = useSearchParams();
+  const nomeDaTurma = searchParams.get("nome");
 
   const [data, setData] = useState([]);
   const [allData, setAllData] = useState([]);
@@ -71,7 +73,8 @@ const ReportPage = () => {
     return (
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">
-          Relatório da Turma {numeroDaTurma}
+          Relatório da Turma{" "}
+          {nomeDaTurma !== null ? nomeDaTurma : numeroDaTurma}
         </h1>
         <MessageBox message="Não há dados para exibir" color="yellow" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -98,7 +101,7 @@ const ReportPage = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">
-        Relatório da Turma {numeroDaTurma}
+        Relatório da Turma {nomeDaTurma !== null ? nomeDaTurma : numeroDaTurma}
       </h1>
 
       <div className="mb-4 p-4 border rounded-md bg-gray-100">
@@ -123,11 +126,11 @@ const ReportPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
         <div className="p-4 border rounded-lg bg-white">
           <PontuacaoLineChart
             data={data}
-            title="Evolução da Pontuação por Bimestre"
+            title="Evolução da Pontuação ao Longo do Tempo"
           />
         </div>
         <div className="p-4 border rounded-lg bg-white">

@@ -1,6 +1,6 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "./providers/AuthProvider";
+import { AuthProvider } from "../providers/AuthProvider";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 

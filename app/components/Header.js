@@ -5,7 +5,7 @@ import { useState } from "react";
 import Navbar from "./Navbar";
 import MobileNavbar from "./MobileNavbar";
 import HomeLink from "./HomeLink";
-import { useAuth } from "../providers/AuthProvider";
+import { useAuth } from "../../providers/AuthProvider";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

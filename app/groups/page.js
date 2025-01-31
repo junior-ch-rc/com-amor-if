@@ -6,10 +6,10 @@ import Modal from "../components/Modal";
 import Button from "../components/Button";
 import MessageBox from "../components/MessageBox";
 import NotAuthorized from "../components/NotAuthorized";
-import { isFromCategory } from "../utils/role";
+import { isFromCategory } from "../../utils/role";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { fetchPrivateData, postPrivateData } from "../utils/api";
-import { useAuth } from "../providers/AuthProvider";
+import { fetchPrivateData, postPrivateData } from "../../utils/api";
+import { useAuth } from "../../providers/AuthProvider";
 
 const GroupManagement = () => {
   const [turmas, setTurmas] = useState([]);

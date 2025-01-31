@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Dropdown from "./Dropdown";
-import { getIFRNUrl } from "../utils/getIFRNUrl";
+import { getIFRNUrl } from "../../utils/getIFRNUrl";
 
 const Navbar = ({ isLoggedIn, username }) => {
   const usernameShort = username?.split(" ")[0]; // Extrai o primeiro nome

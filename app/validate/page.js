@@ -7,8 +7,8 @@ import MessageBox from "../components/MessageBox";
 import NotAuthorized from "../components/NotAuthorized";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Modal from "../components/Modal";
-import { fetchPrivateData, postPrivateData } from "../utils/api";
-import { useAuth } from "../providers/AuthProvider";
+import { fetchPrivateData, postPrivateData } from "../../utils/api";
+import { useAuth } from "../../providers/AuthProvider";
 import { format } from "date-fns";
 
 const tabs = [

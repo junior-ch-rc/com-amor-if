@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaUserCircle } from "react-icons/fa"; // Importando o ícone
 import { useRouter } from "next/navigation";
 
-import { useAuth } from "../providers/AuthProvider";
-import { isFromCategory } from "../utils/role";
+import { useAuth } from "../../providers/AuthProvider";
+import { isFromCategory } from "../../utils/role";
 
 const Dropdown = ({ username }) => {
   const [isOpen, setIsOpen] = useState(false);

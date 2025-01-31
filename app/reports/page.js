@@ -21,6 +21,7 @@ const ReportsPage = () => {
   const [error, setError] = useState(null);
 
   const [pontuacoes, setPontuacoes] = useState([]);
+  const [todasPontuacoes, setTodasPontuacoes] = useState([]);
   const [turmas, setTurmas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,12 +36,13 @@ const ReportsPage = () => {
         ]);
 
         if (!pontuacaoRes.ok || !turmasRes.ok) {
-          throw new Error("Erro ao buscar os dados.");
+          setError("Erro ao buscar os dados.");
         }
 
         const pontuacaoData = await pontuacaoRes.json();
         const turmasData = await turmasRes.json();
 
+        setTodasPontuacoes(pontuacaoData);
         setPontuacoes(pontuacaoData.filter((p) => p.aplicado));
         setTurmas(turmasData);
       } catch (err) {
@@ -114,7 +116,7 @@ const ReportsPage = () => {
   const sensoMaisPontuado = sensoArray.sort((a, b) => b.total - a.total)[0];
   const sensoMenosPontuado = sensoArray.sort((a, b) => a.total - b.total)[0];
 
-  const filteredData = pontuacoes.filter((p) =>
+  const filteredData = todasPontuacoes.filter((p) =>
     p.nomeTurma.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

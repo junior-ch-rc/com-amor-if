@@ -61,9 +61,11 @@ const PointsValidationPage = () => {
   };
 
   useEffect(() => {
-    const defaultTab = tabs.find((tab) => tab.label === activeTab);
-    if (defaultTab) fetchPoints(defaultTab.endpoint);
-  }, [activeTab, token]);
+    if (user) {
+      const defaultTab = tabs.find((tab) => tab.label === activeTab);
+      if (defaultTab) fetchPoints(defaultTab.endpoint);
+    }
+  }, [activeTab, token, user]);
 
   if (isLoading || isLoggingOut) return <LoadingSpinner />;
   if (!user) return <NotAuthorized />;
@@ -265,7 +267,8 @@ const PointsValidationPage = () => {
           .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
           .map((pontuacao) => ({
             nome_da_turma: pontuacao.turma.nome,
-            bimestre: pontuacao.bimestre,
+            bimestre:
+              pontuacao.bimestre === 4 ? "Extra" : pontuacao.bimestre + 1,
             contador: pontuacao.contador,
             id_turma: pontuacao.turma.id,
             regra: pontuacao.regra.descricao,

@@ -188,7 +188,7 @@ const ReportsPage = () => {
           .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
           .map((p) => ({
             turma: p.nomeTurma,
-            bimestre: p.bimestre,
+            bimestre: p.bimestre === 4 ? "Extra" : p.bimestre + 1,
             regra: p.regra.descricao,
             senso: p.regra.senso.descricao,
             operacao: p.operacao === "SUM" ? "Adição" : "Subtração",

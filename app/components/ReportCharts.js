@@ -39,6 +39,10 @@ export const PontuacaoBarChart = ({ data, title }) => {
   const chartData = Object.values(
     data.reduce((acc, item) => {
       const { bimestre, pontos, regra, operacao } = item;
+
+      // Se for bimestre extra não conte
+      if (bimestre === 4) return acc;
+
       const senso = regra.senso.descricao;
 
       // Corrigir os pontos conforme a operação (adição ou subtração)
@@ -46,7 +50,7 @@ export const PontuacaoBarChart = ({ data, title }) => {
 
       // Inicializa o bimestre se ainda não existir
       if (!acc[bimestre]) {
-        acc[bimestre] = { name: `${bimestre}` };
+        acc[bimestre] = { name: `${bimestre + 1}` };
 
         // Adiciona todos os sensos com pontuação 0 por padrão
         allSensos.forEach((s) => {
@@ -85,12 +89,16 @@ export const PontuacaoLineChart = ({ data, title }) => {
   const formattedData = Object.values(
     data.reduce((acc, item) => {
       const bimestre = item.bimestre; // Assume que 'item.bimestre' já está presente no objeto
+
+      // Se for bimestre extra não conte
+      if (bimestre === 4) return acc;
+
       const senso = item.regra.senso.descricao;
       const pontosCorrigidos =
         item.operacao === "SUB" ? -item.pontos : item.pontos;
 
       // Agrupa pelos bimestres
-      acc[bimestre] = acc[bimestre] || { date: `${bimestre}` };
+      acc[bimestre] = acc[bimestre] || { date: `${bimestre + 1}` };
       acc[bimestre][senso] = (acc[bimestre][senso] || 0) + pontosCorrigidos;
 
       return acc;
@@ -147,7 +155,7 @@ export const PontuacaoRadarChart = ({ data, title }) => {
 
   const radarData = SENSOS.map((senso) => ({
     senso,
-    pontos: pontosPorSenso[senso],
+    pontos: pontosPorSenso[senso] || 0,
   }));
 
   return (

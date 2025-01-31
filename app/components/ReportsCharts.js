@@ -52,8 +52,8 @@ export const PontuacaoEvolucaoChart = ({ colors, turmasArray }) => {
   // Coletamos todos os bimestres únicos
   const bimestresUnicos = new Set();
   turmasArray.forEach((turma) => {
-    Object.keys(turma.bimestres).forEach((bimestre) =>
-      bimestresUnicos.add(bimestre)
+    Object.keys(turma.bimestres).forEach(
+      (bimestre) => bimestre < 4 && bimestresUnicos.add(bimestre) // Elimina bimestre extra
     );
   });
 
@@ -66,7 +66,7 @@ export const PontuacaoEvolucaoChart = ({ colors, turmasArray }) => {
 
   // Criamos o formato final esperado pelo Recharts
   const data = bimestresOrdenados.map((bimestre) => {
-    let entry = { name: bimestre };
+    let entry = { name: Number(bimestre) + 1 };
     turmasArray.forEach((turma) => {
       entry[turma.nome] = turma.bimestres[bimestre] || 0;
     });

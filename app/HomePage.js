@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "./providers/AuthProvider";
+import { useAuth } from "../providers/AuthProvider";
 import { useSearchParams } from "next/navigation";
 import MessageBox from "./components/MessageBox";
 import LoadingSpinner from "./components/LoadingSpinner";

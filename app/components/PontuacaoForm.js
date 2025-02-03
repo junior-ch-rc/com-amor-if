@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { fetchPrivateData } from "../utils/api";
-import { useAuth } from "../providers/AuthProvider";
+import { fetchPrivateData } from "../../utils/api";
+import { useAuth } from "../../providers/AuthProvider";
 
 const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
   const { getToken } = useAuth();

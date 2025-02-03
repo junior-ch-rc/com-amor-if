@@ -8,10 +8,10 @@ import MessageBox from "../components/MessageBox";
 import NotAuthorized from "../components/NotAuthorized";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Modal from "../components/Modal";
-import { fetchPrivateData, postPrivateData } from "../utils/api";
-import { useAuth } from "../providers/AuthProvider";
+import { fetchPrivateData, postPrivateData } from "../../utils/api";
+import { useAuth } from "../../providers/AuthProvider";
 import PontuacaoForm from "../components/PontuacaoForm";
-import { isFromCategory } from "../utils/role";
+import { isFromCategory } from "../../utils/role";
 
 // Cores para cada senso
 const SENSE_COLORS = {

@@ -5,9 +5,9 @@ import Link from "next/link";
 import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
 
-import { useAuth } from "../providers/AuthProvider";
-import { getIFRNUrl } from "../utils/getIFRNUrl";
-import { isFromCategory } from "../utils/role";
+import { useAuth } from "../../providers/AuthProvider";
+import { getIFRNUrl } from "../../utils/getIFRNUrl";
+import { isFromCategory } from "../../utils/role";
 
 const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
   const menuRef = useRef(null);

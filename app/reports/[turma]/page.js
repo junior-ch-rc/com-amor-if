@@ -84,6 +84,9 @@ const ReportPage = () => {
   const negativos = data
     .filter((item) => item.operacao === "SUB")
     .reduce((sum, item) => sum + item.pontos, 0);
+  const pontosBimestreExtra = data
+    .filter((item) => item.bimestre === 4)
+    .reduce((sum, item) => sum + item.pontos, 0);
   const totalPontos = positivos - negativos;
 
   const filteredAllPoints = allData.filter((p) =>
@@ -106,6 +109,10 @@ const ReportPage = () => {
         </p>
         <p>
           <strong>Soma dos Pontos Negativos:</strong> {negativos}
+        </p>
+        <p>
+          <strong>Soma dos Pontos no Bimestre Extra: </strong>{" "}
+          {pontosBimestreExtra}
         </p>
       </div>
 
@@ -149,7 +156,8 @@ const ReportPage = () => {
         data={filteredAllPoints
           .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
           .map((pontuacao) => ({
-            bimestre: pontuacao.bimestre,
+            bimestre:
+              pontuacao.bimestre === 4 ? "Extra" : pontuacao.bimestre + 1,
             contador: pontuacao.contador,
             id_turma: pontuacao.turma.id,
             senso: pontuacao.regra.senso.descricao,

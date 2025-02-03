@@ -16,14 +16,6 @@ const apiUrl = process.env.NEXT_PUBLIC_REACT_APP_API_URL;
 
 const itemsPerPage = 10;
 
-const SENSE_COLORS = {
-  Limpeza: "#18a08c",
-  Saúde: "#49c8aa",
-  Utilização: "#ffbb03",
-  Ordenação: "#ff941b",
-  Autodisciplina: "#ff8486",
-};
-
 const ReportPage = () => {
   const params = useParams();
   const numeroDaTurma = params["turma"];

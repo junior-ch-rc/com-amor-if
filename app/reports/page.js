@@ -11,6 +11,7 @@ import {
   PontuacaoEvolucaoChart,
   RadarSensoChart,
 } from "../components/ReportsCharts";
+import NoData from "../components/NoData";
 
 const apiUrl = process.env.NEXT_PUBLIC_REACT_APP_API_URL;
 
@@ -37,14 +38,15 @@ const ReportsPage = () => {
 
         if (!pontuacaoRes.ok || !turmasRes.ok) {
           setError("Erro ao buscar os dados.");
+        } else {
+          const pontuacaoData = await pontuacaoRes.json();
+          const turmasData = await turmasRes.json();
+  
+          setTodasPontuacoes(pontuacaoData);
+          setPontuacoes(pontuacaoData.filter((p) => p.aplicado));
+          setTurmas(turmasData);
         }
 
-        const pontuacaoData = await pontuacaoRes.json();
-        const turmasData = await turmasRes.json();
-
-        setTodasPontuacoes(pontuacaoData);
-        setPontuacoes(pontuacaoData.filter((p) => p.aplicado));
-        setTurmas(turmasData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -74,6 +76,7 @@ const ReportsPage = () => {
   }, [turmas]);
 
   if (loading) return <LoadingSpinner />;
+  if (todasPontuacoes.length === 0) return <NoData />;
   if (error) return <MessageBox message={error} color="detail-minor" />;
 
   // Cálculo de métricas

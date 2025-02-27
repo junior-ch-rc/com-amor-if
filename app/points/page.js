@@ -38,16 +38,21 @@ const PointsPage = () => {
 
   const fetchPontuacoes = async () => {
     try {
-      const data = await fetchPrivateData(
-        "pontuacao/pontuacaoPorServidor",
-        token
-      );
-      const groupedBySenso = data.reduce((acc, pontuacao) => {
-        const senso = pontuacao.regra.senso.descricao || "Sem Senso";
-        acc[senso] = acc[senso] ? [...acc[senso], pontuacao] : [pontuacao];
-        return acc;
-      }, {});
-      setPontuacoes(groupedBySenso);
+      const anos = await fetchPrivateData("anoletivo/anos", token);
+
+      if (anos.length > 0) {
+        const data = await fetchPrivateData(
+          "pontuacao/pontuacaoPorServidor",
+          token
+        );
+        const groupedBySenso = data.reduce((acc, pontuacao) => {
+          const senso = pontuacao.regra.senso.descricao || "Sem Senso";
+          acc[senso] = acc[senso] ? [...acc[senso], pontuacao] : [pontuacao];
+          return acc;
+        }, {});
+        setPontuacoes(groupedBySenso);
+      }
+      
     } catch (error) {
       setMessages({
         error:

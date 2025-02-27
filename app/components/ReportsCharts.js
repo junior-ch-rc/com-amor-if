@@ -100,10 +100,17 @@ export const PontuacaoEvolucaoChart = ({ colors, turmasArray }) => {
 };
 
 export const RadarSensoChart = ({ sensoArray }) => {
-  // Gráfico de radar (Pontuação por senso)
-  const data = sensoArray.map((s) => ({
-    senso: s.senso,
-    Pontuação: s.total,
+  const SENSOS = [
+    "Limpeza",
+    "Saúde",
+    "Utilização",
+    "Ordenação",
+    "Autodisciplina",
+  ];
+
+  const data = SENSOS.map((senso) => ({
+    senso,
+    Pontuação: sensoArray.find((item) => item.senso === senso)?.total ?? 0,
   }));
 
   return (

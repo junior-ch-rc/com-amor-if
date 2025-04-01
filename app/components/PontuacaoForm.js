@@ -224,7 +224,6 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
           onChange={handleInputChange}
           className="w-full mt-1 p-2 border rounded"
           rows="3"
-          required
         ></textarea>
       </div>
 

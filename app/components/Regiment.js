@@ -1,11 +1,8 @@
 import React from "react";
 
-const Regiment = () => {
-  const handleDownload = () => {
-    // Lógica para download do arquivo
-    window.location.href = "/regulamento.pdf"; // Substitua pelo caminho correto do seu arquivo
-  };
+import Link from "next/link";
 
+const Regiment = () => {
   return (
     <section
       id="regiment"
@@ -29,12 +26,16 @@ const Regiment = () => {
       <p className="text-sm md:text-base text-gray-800 mb-6">
         Baixe aqui o regulamento.
       </p>
-      <button
-        onClick={handleDownload}
-        className="bg-primary text-white py-2 px-6 rounded-lg hover:bg-primary-dark transition duration-300"
-      >
-        Baixar Regulamento
-      </button>
+      <Link href="/regulamento.pdf" passHref legacyBehavior>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-primary text-white py-2 px-6 rounded-lg hover:bg-primary-dark transition duration-300"
+          download
+        >
+          Baixar Regulamento
+        </a>
+      </Link>
     </section>
   );
 };

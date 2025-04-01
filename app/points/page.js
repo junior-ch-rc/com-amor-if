@@ -246,8 +246,7 @@ const PointsPage = () => {
               "Regra",
               "Operacao",
               "Pontos",
-              "Aplicado",
-              "Anulado",
+              "Status",
               "Registrado Em",
             ]}
             data={
@@ -264,8 +263,11 @@ const PointsPage = () => {
                         pontuacao.operacao === "SUM" ? "Adição" : "Subtração",
                       pontos: pontuacao.pontos,
                       contador: pontuacao.contador,
-                      aplicado: pontuacao.aplicado ? "Verdadeiro" : "Falso",
-                      anulado: pontuacao.anulado ? "Verdadeiro" : "Falso",
+                      status: pontuacao.aplicado
+                        ? "Aplicado"
+                        : pontuacao.anulado
+                        ? "Anulado"
+                        : "Pendente",
                       registrado_em: format(
                         new Date(pontuacao.createdAt),
                         "dd/MM/yyyy HH:mm:ss"

@@ -180,8 +180,7 @@ const ReportsPage = () => {
           "Regra",
           "Operacao",
           "Pontos",
-          "Aplicado",
-          "Anulado",
+          "Status",
           "Registrado Em",
           "Criado Por",
           "Detalhes",
@@ -195,8 +194,11 @@ const ReportsPage = () => {
             senso: p.regra.senso.descricao,
             operacao: p.operacao === "SUM" ? "Adição" : "Subtração",
             pontos: p.pontos,
-            aplicado: p.aplicado ? "Verdadeiro" : "Falso",
-            anulado: p.anulado ? "Verdadeiro" : "Falso",
+            status: p.aplicado
+              ? "Aplicado"
+              : p.anulado
+              ? "Anulado"
+              : "Pendente",
             data: format(new Date(p.createdAt), "dd/MM/yyyy"),
             criado_por: p.criadoPor.username,
             registrado_em: format(new Date(p.createdAt), "dd/MM/yyyy HH:mm:ss"),

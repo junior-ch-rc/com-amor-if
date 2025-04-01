@@ -13,25 +13,25 @@ import { format } from "date-fns";
 
 const tabs = [
   {
-    label: "Pontos a Validar",
+    label: "Pendentes",
     endpoint: "pontuacao/pontosDoAnoCorrenteParaValidar",
   },
   {
-    label: "Pontos Aplicados",
+    label: "Aplicados",
     endpoint: "pontuacao/pontosDoAnoCorrenteAplicados",
   },
   {
-    label: "Pontos Anulados",
+    label: "Anulados",
     endpoint: "pontuacao/pontosDoAnoCorrenteAnulados",
   },
   { label: "Todos os Pontos", endpoint: "pontuacao/pontosDoAnoCorrente" },
 ];
 
 const TABS_COLORS = {
-  "Pontos a Validar": "#18a08c",
-  "Pontos Aplicados": "#49c8aa",
+  Pendentes: "#18a08c",
+  Aplicados: "#49c8aa",
   "Todos os Pontos": "#ffbb03",
-  "Pontos Anulados": "#ff8486",
+  Anulados: "#ff8486",
 };
 
 const itemsPerPage = 10;
@@ -73,17 +73,17 @@ const PointsValidationPage = () => {
   // Função para definir as ações conforme a aba ativa
   const getActions = (tab) => {
     switch (tab) {
-      case "Pontos a Validar":
+      case "Pendentes":
         return [
           { label: "Deletar", color: "bg-red-500", onClick: handleDelete },
           { label: "Aplicar", color: "bg-green-500", onClick: handleApply },
           { label: "Anular", color: "bg-yellow-500", onClick: handleAnnul },
         ];
-      case "Pontos Aplicados":
+      case "Aplicados":
         return [
           { label: "Anular", color: "bg-yellow-500", onClick: handleAnnul },
         ];
-      case "Pontos Anulados":
+      case "Anulados":
         return [
           { label: "Aplicar", color: "bg-green-500", onClick: handleApply },
         ];
@@ -237,14 +237,14 @@ const PointsValidationPage = () => {
 
       <br></br>
 
-      {activeTab === "Pontos a Validar" && (
+      {activeTab === "Pendentes" && (
         <>
           <button
             key="aplicarTudo"
             className={`px-4 py-2 m-1 mb-6 text-md font-medium rounded bg-green-500`}
             onClick={handleApplyAll}
           >
-            Aplicar todos os pontos a validar
+            Aplicar todos os pontos pendentes
           </button>
         </>
       )}
@@ -258,8 +258,7 @@ const PointsValidationPage = () => {
           "Regra",
           "Operacao",
           "Pontos",
-          "Aplicado",
-          "Anulado",
+          "Status",
           "Registrado Em",
           "Registrado Por",
         ]}
@@ -274,8 +273,11 @@ const PointsValidationPage = () => {
             regra: pontuacao.regra.descricao,
             operacao: pontuacao.operacao === "SUM" ? "Adição" : "Subtração",
             pontos: pontuacao.pontos,
-            aplicado: pontuacao.aplicado ? "Verdadeiro" : "Falso",
-            anulado: pontuacao.anulado ? "Verdadeiro" : "Falso",
+            status: pontuacao.aplicado
+              ? "Aplicado"
+              : pontuacao.anulado
+              ? "Anulado"
+              : "Pendente",
             registrado_em: format(
               new Date(pontuacao.createdAt),
               "dd/MM/yyyy HH:mm:ss"

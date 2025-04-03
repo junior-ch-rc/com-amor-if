@@ -123,19 +123,16 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
                   </>
                 )}
                 {isFromCategory(user, "Aval") ||
-                  (isFromCategory(user, "Admin") && (
-                    <>
-                      {" "}
-                      <li>
-                        <a
-                          href="/points"
-                          className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
-                        >
-                          Lançar Pontos
-                        </a>
-                      </li>
-                    </>
-                  ))}
+                isFromCategory(user, "Admin") ? (
+                  <li>
+                    <a
+                      href="/points"
+                      className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
+                    >
+                      Lançar Pontos
+                    </a>
+                  </li>
+                ) : null}
                 <li>
                   <a
                     href="#"

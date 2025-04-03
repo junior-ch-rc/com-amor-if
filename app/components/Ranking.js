@@ -27,7 +27,9 @@ const Ranking = () => {
       const sortedTurmas = data.sort((a, b) => b.pontuacao - a.pontuacao);
       setTurmas(sortedTurmas);
     } catch (error) {
-      setErrorMessage("Erro ao buscar turmas: " + error.response.data.errors[0]);
+      setErrorMessage(
+        "Erro ao buscar turmas: " + error.response.data.errors[0]
+      );
       setErrorMessage(
         "Erro ao carregar o ranking. Por favor, tente novamente mais tarde."
       );
@@ -72,9 +74,9 @@ const Ranking = () => {
               }`}
             >
               <div className="flex items-center">
-                {index === 0 && (
+                {index === 0 && turma.pontuacao > 0 ? (
                   <FaCrown className="text-yellow-400 text-2xl mr-3" />
-                )}
+                ) : null}
                 <span className="text-lg font-semibold mr-2">{turma.nome}</span>
                 <span
                   className={`text-sm ${

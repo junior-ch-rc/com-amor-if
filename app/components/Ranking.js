@@ -68,19 +68,21 @@ const Ranking = () => {
             <li
               key={turma.id}
               className={`flex items-center justify-between rounded-md ${
-                index === 0
+                index === 0 && turma.pontuacao > 0
                   ? "bg-primary text-white px-[5px] md:px-4 py-4"
                   : "bg-gray-100 text-gray-800 p-4"
               }`}
             >
               <div className="flex items-center">
-                {index === 0 && turma.pontuacao > 0 ? (
+                {(index === 0 && turma.pontuacao) > 0 ? (
                   <FaCrown className="text-yellow-400 text-2xl mr-3" />
                 ) : null}
                 <span className="text-lg font-semibold mr-2">{turma.nome}</span>
                 <span
                   className={`text-sm ${
-                    index === 0 ? "text-white" : "text-gray-500"
+                    index === 0 && turma.pontuacao > 0
+                      ? "text-white"
+                      : "text-gray-500"
                   }`}
                 >
                   ({turma.descricao})

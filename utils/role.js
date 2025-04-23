@@ -12,6 +12,7 @@ export const Roles = {
   ROLE_COORDENADOR_CURSO: "Aval",
   ROLE_COEXPEIN: "Aval",
   ROLE_DOCENTE: "Aval",
+  ROLE_SEAC: "Aval",
 };
 
 // Função para verificar acesso com base na role

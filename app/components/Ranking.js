@@ -51,9 +51,9 @@ const Ranking = () => {
       <h2 className="text-2xl font-bold text-center mb-6 text-primary">
         Ranking de Turmas
       </h2>
-
+  
       {isLoading && <LoadingSpinner />}
-
+  
       {errorMessage && (
         <MessageBox
           message={errorMessage}
@@ -61,40 +61,45 @@ const Ranking = () => {
           onClose={() => setErrorMessage(null)}
         />
       )}
-
+  
       {!isLoading && !errorMessage && (
         <ul className="space-y-4">
-          {turmas.map((turma, index) => (
-            <li
-              key={turma.id}
-              className={`flex items-center justify-between rounded-md ${
-                index === 0 && turma.pontuacao > 0
-                  ? "bg-primary text-white px-[5px] md:px-4 py-4"
-                  : "bg-gray-100 text-gray-800 p-4"
-              }`}
-            >
-              <div className="flex items-center">
-                {(index === 0 && turma.pontuacao) > 0 ? (
-                  <FaCrown className="text-yellow-400 text-2xl mr-3" />
-                ) : null}
-                <span className="text-lg font-semibold mr-2">{turma.nome}</span>
-                <span
-                  className={`text-sm ${
-                    index === 0 && turma.pontuacao > 0
-                      ? "text-white"
-                      : "text-gray-500"
-                  }`}
-                >
-                  ({turma.descricao})
-                </span>
-              </div>
-              <div className="text-lg font-bold">{turma.pontuacao} pts</div>
-            </li>
-          ))}
+          {turmas.map((turma, index) => {
+            const isFirstPlace =
+              index === 0 &&
+              turma.pontuacao > 0 &&
+              (turmas.length === 1 || turma.pontuacao !== turmas[1]?.pontuacao);
+  
+            return (
+              <li
+                key={turma.id}
+                className={`flex items-center justify-between rounded-md ${
+                  isFirstPlace
+                    ? "bg-primary text-white px-[5px] md:px-4 py-4"
+                    : "bg-gray-100 text-gray-800 p-4"
+                }`}
+              >
+                <div className="flex items-center">
+                  {isFirstPlace && (
+                    <FaCrown className="text-yellow-400 text-2xl mr-3" />
+                  )}
+                  <span className="text-lg font-semibold mr-2">{turma.nome}</span>
+                  <span
+                    className={`text-sm ${
+                      isFirstPlace ? "text-white" : "text-gray-500"
+                    }`}
+                  >
+                    ({turma.descricao})
+                  </span>
+                </div>
+                <div className="text-lg font-bold">{turma.pontuacao} pts</div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
-  );
+  );  
 };
 
 export default Ranking;

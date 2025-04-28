@@ -256,6 +256,7 @@ const PointsValidationPage = () => {
           "Nome da Turma",
           "Bimestre",
           "Regra",
+          "Motivacao",
           "Operacao",
           "Pontos",
           "Status",
@@ -271,6 +272,7 @@ const PointsValidationPage = () => {
             contador: pontuacao.contador,
             id_turma: pontuacao.turma.id,
             regra: pontuacao.regra.descricao,
+            motivacao: pontuacao.descricao,
             operacao: pontuacao.operacao === "SUM" ? "Adição" : "Subtração",
             pontos: pontuacao.pontos,
             status: pontuacao.aplicado

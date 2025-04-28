@@ -244,6 +244,7 @@ const PointsPage = () => {
             headers={[
               "Nome da Turma",
               "Regra",
+              "Motivacao",
               "Operacao",
               "Pontos",
               "Status",
@@ -259,6 +260,7 @@ const PointsPage = () => {
                     .map((pontuacao) => ({
                       nome_da_turma: pontuacao.turma.nome,
                       regra: pontuacao.regra.descricao,
+                      motivacao: pontuacao.descricao,
                       operacao:
                         pontuacao.operacao === "SUM" ? "Adição" : "Subtração",
                       pontos: pontuacao.pontos,

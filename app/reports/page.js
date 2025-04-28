@@ -76,7 +76,9 @@ const ReportsPage = () => {
   }, [turmas]);
 
   if (loading) return <LoadingSpinner />;
-  if (todasPontuacoes.length === 0) return <NoData />;
+  if (todasPontuacoes.length === 0 || !todasPontuacoes.some(p => p.aplicado)) {
+    return <NoData />;
+  }
   if (error) return <MessageBox message={error} color="detail-minor" />;
 
   // Cálculo de métricas

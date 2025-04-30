@@ -38,7 +38,7 @@ export const TurmaBarChart = ({ turmasArray }) => {
           />
           <YAxis />
           <Tooltip />
-          <Legend />
+          <Legend height={30} wrapperStyle={{ bottom: -10 }} />
           <Bar dataKey="pontuacao" fill="#fa7373" name="Pontuação" />
         </BarChart>
       </ResponsiveContainer>

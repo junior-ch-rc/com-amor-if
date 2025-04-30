@@ -18,7 +18,12 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
 
   const handleLogout = (e) => {
     e.preventDefault();
+    toggleMenu(false);
     logout();
+  };
+
+  const handleLinkClick = () => {
+    toggleMenu(false);
   };
 
   return (
@@ -45,6 +50,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
           <ul>
             <li>
               <Link
+                onClick={handleLinkClick}
                 href="/"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
@@ -53,6 +59,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
             </li>
             <li>
               <Link
+                onClick={handleLinkClick}
                 href="/reports"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
@@ -61,6 +68,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
             </li>
             <li>
               <Link
+                onClick={handleLinkClick}
                 href="/#ranking"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
@@ -69,6 +77,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
             </li>
             <li>
               <Link
+                onClick={handleLinkClick}
                 href="/#about"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
@@ -77,6 +86,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
             </li>
             <li>
               <Link
+                onClick={handleLinkClick}
                 href="/#regiment"
                 className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
               >
@@ -98,6 +108,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
                   <>
                     <li>
                       <a
+                        onClick={handleLinkClick}
                         href="/groups"
                         className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
                       >
@@ -106,6 +117,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
                     </li>
                     <li>
                       <a
+                        onClick={handleLinkClick}
                         href="/years"
                         className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
                       >
@@ -114,6 +126,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
                     </li>
                     <li>
                       <a
+                        onClick={handleLinkClick}
                         href="/validate"
                         className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
                       >
@@ -126,6 +139,7 @@ const MobileNavbar = ({ isLoggedIn, isMenuOpen, toggleMenu }) => {
                 isFromCategory(user, "Admin") ? (
                   <li>
                     <a
+                      onClick={handleLinkClick}
                       href="/points"
                       className="block py-2 text-black hover:bg-gray-100 px-4 rounded-lg transition duration-200 ease-in-out"
                     >

@@ -101,16 +101,16 @@ export const PontuacaoEvolucaoChart = ({ colors, turmasArray }) => {
 
 export const RadarSensoChart = ({ sensoArray }) => {
   const SENSOS = [
-    "Limpeza",
-    "Saúde",
-    "Utilização",
-    "Ordenação",
-    "Autodisciplina",
+    { nome: "Limpeza", abreviado: "Lim" },
+    { nome: "Saúde", abreviado: "Saú" },
+    { nome: "Utilização", abreviado: "Util" },
+    { nome: "Ordenação", abreviado: "Ord" },
+    { nome: "Autodisciplina", abreviado: "Auto" },
   ];
 
-  const data = SENSOS.map((senso) => ({
-    senso,
-    Pontuação: sensoArray.find((item) => item.senso === senso)?.total ?? 0,
+  const data = SENSOS.map((s) => ({
+    senso: s.abreviado,
+    pontos: sensoArray.find((item) => item.senso === s.nome)?.total ?? 0,
   }));
 
   return (
@@ -124,14 +124,14 @@ export const RadarSensoChart = ({ sensoArray }) => {
           <PolarAngleAxis
             dataKey="senso"
             tick={{
-              fontSize: window.innerWidth < 600 ? 8 : 14,
-              angle: window.innerWidth < 600 ? -40 : 0,
+              fontSize: window.innerWidth < 600 ? 10 : 14,
+              angle: 0,
             }}
           />
           <PolarRadiusAxis />
           <Radar
             name="Média"
-            dataKey="Pontuação"
+            dataKey="pontos"
             stroke="#ffb536"
             fill="#ffb536"
             fillOpacity={0.6}

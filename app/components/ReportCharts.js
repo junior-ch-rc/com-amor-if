@@ -138,11 +138,11 @@ export const PontuacaoLineChart = ({ data, title }) => {
 
 export const PontuacaoRadarChart = ({ data, title }) => {
   const SENSOS = [
-    "Limpeza",
-    "Saúde",
-    "Utilização",
-    "Ordenação",
-    "Autodisciplina",
+    { nome: "Limpeza", abreviado: "Lim" },
+    { nome: "Saúde", abreviado: "Saú" },
+    { nome: "Utilização", abreviado: "Util" },
+    { nome: "Ordenação", abreviado: "Ord" },
+    { nome: "Autodisciplina", abreviado: "Auto" },
   ];
 
   const pontosPorSenso = data.reduce((acc, item) => {
@@ -154,8 +154,8 @@ export const PontuacaoRadarChart = ({ data, title }) => {
   }, {});
 
   const radarData = SENSOS.map((senso) => ({
-    senso,
-    pontos: pontosPorSenso[senso] || 0,
+    senso: senso.abreviado,
+    pontos: pontosPorSenso[senso.nome] || 0,
   }));
 
   return (
@@ -167,8 +167,8 @@ export const PontuacaoRadarChart = ({ data, title }) => {
           <PolarAngleAxis
             dataKey="senso"
             tick={{
-              fontSize: window.innerWidth < 600 ? 8 : 14,
-              angle: window.innerWidth < 600 ? -40 : 0,
+              fontSize: window.innerWidth < 600 ? 10 : 14,
+              angle: 0,
             }}
           />
           <PolarRadiusAxis />

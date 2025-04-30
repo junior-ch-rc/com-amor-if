@@ -84,7 +84,9 @@ const Ranking = () => {
                   {isFirstPlace && (
                     <FaCrown className="text-yellow-400 text-xl" />
                   )}
-                  <span className="text-lg font-semibold">{turma.nome}</span>
+                  <span className="text-lg font-semibold">
+                    {turma.descricao}
+                  </span>
                 </div>
 
                 {/* Linha 2: Descrição + Pontuação */}
@@ -92,7 +94,7 @@ const Ranking = () => {
                   <span
                     className={isFirstPlace ? "text-white" : "text-gray-500"}
                   >
-                    ({turma.descricao})
+                    {turma.nome}
                   </span>
                   <span className="font-bold">
                     {turma.pontuacao.toLocaleString()} pts

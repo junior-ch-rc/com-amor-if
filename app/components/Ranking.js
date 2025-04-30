@@ -51,9 +51,9 @@ const Ranking = () => {
       <h2 className="text-2xl font-bold text-center mb-6 text-primary">
         Ranking de Turmas
       </h2>
-  
+
       {isLoading && <LoadingSpinner />}
-  
+
       {errorMessage && (
         <MessageBox
           message={errorMessage}
@@ -61,7 +61,7 @@ const Ranking = () => {
           onClose={() => setErrorMessage(null)}
         />
       )}
-  
+
       {!isLoading && !errorMessage && (
         <ul className="space-y-4">
           {turmas.map((turma, index) => {
@@ -69,37 +69,42 @@ const Ranking = () => {
               index === 0 &&
               turma.pontuacao > 0 &&
               (turmas.length === 1 || turma.pontuacao !== turmas[1]?.pontuacao);
-  
+
             return (
               <li
                 key={turma.id}
-                className={`flex items-center justify-between rounded-md ${
+                className={`rounded-md p-4 ${
                   isFirstPlace
-                    ? "bg-primary text-white px-[5px] md:px-4 py-4"
-                    : "bg-gray-100 text-gray-800 p-4"
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 text-gray-800"
                 }`}
               >
-                <div className="flex items-center">
+                {/* Linha 1: Ícone + Nome */}
+                <div className="flex items-center gap-2 mb-1">
                   {isFirstPlace && (
-                    <FaCrown className="text-yellow-400 text-2xl mr-3" />
+                    <FaCrown className="text-yellow-400 text-xl" />
                   )}
-                  <span className="text-lg font-semibold mr-2">{turma.nome}</span>
+                  <span className="text-lg font-semibold">{turma.nome}</span>
+                </div>
+
+                {/* Linha 2: Descrição + Pontuação */}
+                <div className="flex items-center justify-between text-sm md:text-base">
                   <span
-                    className={`text-sm ${
-                      isFirstPlace ? "text-white" : "text-gray-500"
-                    }`}
+                    className={isFirstPlace ? "text-white" : "text-gray-500"}
                   >
                     ({turma.descricao})
                   </span>
+                  <span className="font-bold">
+                    {turma.pontuacao.toLocaleString()} pts
+                  </span>
                 </div>
-                <div className="text-lg font-bold">{turma.pontuacao} pts</div>
               </li>
             );
           })}
         </ul>
       )}
     </div>
-  );  
+  );
 };
 
 export default Ranking;

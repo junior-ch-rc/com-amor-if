@@ -48,7 +48,7 @@ const Ranking = () => {
       id="ranking"
       className="w-full max-w-3xl mx-auto bg-white shadow-lg rounded-md mt-6 p-2 md:p-6"
     >
-      <h2 className="text-2xl font-bold text-center mb-6 text-primary">
+      <h2 className="text-2xl font-bold text-center mt-4 md:mt-0 mb-6 text-primary">
         Ranking de Turmas
       </h2>
 

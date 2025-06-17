@@ -145,13 +145,27 @@ export const PontuacaoRadarChart = ({ data, title }) => {
     { nome: "Autodisciplina", abreviado: "Auto" },
   ];
 
+  let sensoContador = {};
+
   const pontosPorSenso = data.reduce((acc, item) => {
     const senso = item.regra.senso.descricao;
+
     const pontosCorrigidos =
       item.operacao === "SUB" ? -item.pontos : item.pontos;
+
     acc[senso] = (acc[senso] || 0) + pontosCorrigidos;
+
+    if (!sensoContador[senso]) sensoContador[senso] = 0;
+    sensoContador[senso]++;
+
     return acc;
   }, {});
+
+  Object.keys(pontosPorSenso).forEach((senso) => {
+    pontosPorSenso[senso] = Math.round(
+      pontosPorSenso[senso] / sensoContador[senso]
+    );
+  });
 
   const radarData = SENSOS.map((senso) => ({
     senso: senso.abreviado,

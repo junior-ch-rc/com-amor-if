@@ -41,12 +41,11 @@ const ReportsPage = () => {
         } else {
           const pontuacaoData = await pontuacaoRes.json();
           const turmasData = await turmasRes.json();
-  
+
           setTodasPontuacoes(pontuacaoData);
           setPontuacoes(pontuacaoData.filter((p) => p.aplicado));
           setTurmas(turmasData);
         }
-
       } catch (err) {
         setError(err.message);
       } finally {
@@ -76,7 +75,10 @@ const ReportsPage = () => {
   }, [turmas]);
 
   if (loading) return <LoadingSpinner />;
-  if (todasPontuacoes.length === 0 || !todasPontuacoes.some(p => p.aplicado)) {
+  if (
+    todasPontuacoes.length === 0 ||
+    !todasPontuacoes.some((p) => p.aplicado)
+  ) {
     return <NoData />;
   }
   if (error) return <MessageBox message={error} color="detail-minor" />;
@@ -84,6 +86,7 @@ const ReportsPage = () => {
   // Cálculo de métricas
   const turmasPontuacao = {};
   const sensoPontuacao = {};
+  const sensoContador = {};
 
   pontuacoes.forEach((p) => {
     const { idTurma, nomeTurma, pontos, regra, operacao, bimestre } = p;
@@ -101,7 +104,15 @@ const ReportsPage = () => {
       (operacao === "SUM" ? pontos : -pontos);
 
     if (!sensoPontuacao[senso]) sensoPontuacao[senso] = 0;
+    if (!sensoContador[senso]) sensoContador[senso] = 0;
     sensoPontuacao[senso] += operacao === "SUM" ? pontos : -pontos;
+    sensoContador[senso]++;
+  });
+
+  Object.keys(sensoPontuacao).forEach((senso) => {
+    sensoPontuacao[senso] = Math.round(
+      sensoPontuacao[senso] / sensoContador[senso]
+    );
   });
 
   // Garantir que todas as turmas apareçam no relatório, mesmo sem pontuação
@@ -140,12 +151,12 @@ const ReportsPage = () => {
           <strong>Total de Turmas:</strong> {turmas.length}
         </p>
         <p>
-          <strong>Senso mais pontuado:</strong> {sensoMaisPontuado.senso} (
-          {sensoMaisPontuado.total} pontos)
+          <strong>Senso mais pontuado:</strong> {sensoMaisPontuado.senso} (Média
+          de {sensoMaisPontuado.total} pontos)
         </p>
         <p>
-          <strong>Senso menos pontuado:</strong> {sensoMenosPontuado.senso} (
-          {sensoMenosPontuado.total} pontos)
+          <strong>Senso menos pontuado:</strong> {sensoMenosPontuado.senso}{" "}
+          (Média de {sensoMenosPontuado.total} pontos)
         </p>
       </div>
 

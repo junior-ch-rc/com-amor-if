@@ -27,16 +27,36 @@ export default {
   theme: {
     extend: {
       colors: {
-        wheat: "#f5deb3",
-        primary: "#18a08c",
-        "primary-light": "#49c8aa",
+        // Base clara (substitui o wheat por algo mais clean da imagem)
+        background: "#f7f6f2",
+        foreground: "#1f2937",
+
+        // Verde institucional (principal)
+        primary: "#1f8f5f",
+        "primary-light": "#4bbf8a",
+        "primary-dark": "#166b47",
+
+        // Vermelho IF (agora entra como secundário forte)
+        secondary: "#d92d2d",
+        "secondary-light": "#ff5a5a",
+
+        // Dourado do troféu (call to action / destaque)
+        accent: "#f4b400",
+        "accent-soft": "#ffd166",
+
+        // Detalhes (mantendo sua ideia, mas ajustando à nova estética)
         detail: {
-          DEFAULT: "#ffbb03",
-          subtle: "#ff941b",
-          minor: "#ff8486",
+          DEFAULT: "#f4b400", // dourado principal
+          subtle: "#ff7a00", // laranja energético
+          minor: "#e63946", // vermelho suave
         },
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+
+        // Neutros (importante pra UI moderna)
+        neutral: {
+          light: "#ffffff",
+          medium: "#e5e7eb",
+          dark: "#374151",
+        },
       },
     },
   },

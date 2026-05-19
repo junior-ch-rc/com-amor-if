@@ -1,6 +1,20 @@
-import React from "react";
+import { useEffect, useState } from "react";
 
 const BackToTop = () => {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setVisible(window.scrollY > 100); // aparece após 100px
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  if (!visible) return null;
+
   return (
     <a
       href="#home"

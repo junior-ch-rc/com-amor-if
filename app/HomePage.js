@@ -9,6 +9,7 @@ import Ranking from "./components/Ranking"; // Importar o Ranking
 import About from "./components/About";
 import Regiment from "./components/Regiment";
 import BackToTop from "./components/BackToTop";
+import PodiumCarousel from "./components/PodiumCarousel";
 
 const HomePage = () => {
   const params = useSearchParams();
@@ -55,6 +56,8 @@ const HomePage = () => {
       <div className="p-4">
         <Ranking /> {/* Inserir o Ranking na HomePage */}
       </div>
+
+      <PodiumCarousel />
 
       <About />
 

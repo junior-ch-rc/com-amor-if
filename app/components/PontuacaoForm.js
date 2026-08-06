@@ -3,7 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { fetchPrivateData } from "../../utils/api";
 import { useAuth } from "../../providers/AuthProvider";
+import { FaCircleCheck, FaCircleMinus, FaCirclePlus } from "react-icons/fa6";
 import RuleSelect from "./RuleSelect";
+
+const fieldLabelClassName = "block text-sm font-semibold text-gray-700";
+const fieldControlClassName =
+  "mt-2 min-h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500";
 
 const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
   const { getToken } = useAuth();
@@ -71,10 +76,29 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Seletor de Regra */}
       <div>
-        <label htmlFor="regra" className="block text-sm font-medium text-gray-700">Regra</label>
+        <div className="flex min-h-6 flex-wrap items-center justify-between gap-2">
+          <label htmlFor="regra" className={fieldLabelClassName}>Regra</label>
+          {operacao && (
+            <span
+              className={`inline-flex items-center gap-1.5 text-sm font-medium ${
+                operacao === "SUM" ? "text-green-700" : "text-red-700"
+              }`}
+              aria-live="polite"
+            >
+              {operacao === "SUM" ? (
+                <FaCirclePlus className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <FaCircleMinus className="h-4 w-4" aria-hidden="true" />
+              )}
+              {operacao === "SUM"
+                ? "Operação de adição"
+                : "Operação de subtração"}
+            </span>
+          )}
+        </div>
         <RuleSelect
           rules={regras}
           selectedRuleId={formData.idRegra}
@@ -82,154 +106,131 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
         />
       </div>
 
-      {/* Indicativo de operação */}
-      {operacao && (
-        <div
-          className={`mt-2 ${
-            operacao === "SUM" ? "text-green-500" : "text-red-500"
-          }`}
-        >
-          <p>
-            {operacao === "SUM"
-              ? "Operação de adição"
-              : "Operação de subtração"}
-          </p>
-        </div>
-      )}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        {/* Select Turma ou Turno */}
+        {tipoRegra?.porTurno ? (
+          <div>
+            <label htmlFor="turno" className={fieldLabelClassName}>Turno</label>
+            <select
+              id="turno"
+              name="turno"
+              value={formData.turno}
+              onChange={handleInputChange}
+              className={fieldControlClassName}
+              required
+            >
+              <option value="">Selecione um turno</option>
+              <option value="0">Matutino</option>
+              <option value="1">Vespertino</option>
+            </select>
+          </div>
+        ) : (
+          <div>
+            <label htmlFor="turma" className={fieldLabelClassName}>Turma</label>
+            <select
+              id="turma"
+              name="idTurma"
+              value={formData.idTurma}
+              onChange={handleInputChange}
+              className={fieldControlClassName}
+              required
+            >
+              <option value="">Selecione uma turma</option>
+              {turmas.map((turma) => (
+                <option key={turma.id} value={turma.id}>
+                  {turma.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
-      {/* Select Turma ou Turno */}
-      {tipoRegra?.porTurno ? (
-        <div>
-          <label htmlFor="turno" className="block text-sm font-medium text-gray-700">
-            Turno
-          </label>
-          <select
-            id="turno"
-            name="turno"
-            value={formData.turno}
-            onChange={handleInputChange}
-            className="w-full mt-1 p-2 border rounded"
-            required
-          >
-            <option value="">Selecione um turno</option>
-            <option value="0">Matutino</option>
-            <option value="1">Vespertino</option>
-          </select>
-        </div>
-      ) : (
-        <div>
-          <label htmlFor="turma" className="block text-sm font-medium text-gray-700">
-            Turma
-          </label>
-          <select
-            id="turma"
-            name="idTurma"
-            value={formData.idTurma}
-            onChange={handleInputChange}
-            className="w-full mt-1 p-2 border rounded"
-            required
-          >
-            <option value="">Selecione uma turma</option>
-            {turmas.map((turma) => (
-              <option key={turma.id} value={turma.id}>
-                {turma.nome}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+        {/* Select Bimestre */}
+        {(tipoRegra?.frequencia !== 0 || tipoRegra?.bimestreExtra) && (
+          <div>
+            <label htmlFor="bimestre" className={fieldLabelClassName}>Bimestre</label>
+            <select
+              id="bimestre"
+              name="bimestre"
+              value={formData.bimestre}
+              onChange={handleInputChange}
+              className={fieldControlClassName}
+              required
+              disabled={tipoRegra?.bimestreExtra}
+            >
+              <option value="0">1º Bimestre</option>
+              <option value="1">2º Bimestre</option>
+              <option value="2">3º Bimestre</option>
+              <option value="3">4º Bimestre</option>
+              <option value="4">Bimestre Extra</option>
+            </select>
+          </div>
+        )}
 
-      {/* Select Bimestre */}
-      {(tipoRegra?.frequencia !== 0 || tipoRegra?.bimestreExtra) && (
-        <div>
-          <label htmlFor="bimestre" className="block text-sm font-medium text-gray-700">
-            Bimestre
-          </label>
-          <select
-            id="bimestre"
-            name="bimestre"
-            value={formData.bimestre}
-            onChange={handleInputChange}
-            className="w-full mt-1 p-2 border rounded"
-            required
-            disabled={tipoRegra?.bimestreExtra}
-          >
-            <option value="0">1º Bimestre</option>
-            <option value="1">2º Bimestre</option>
-            <option value="2">3º Bimestre</option>
-            <option value="3">4º Bimestre</option>
-            <option value="4">Bimestre Extra</option>
-          </select>
-        </div>
-      )}
+        {/* Pontos */}
+        {tipoRegra?.fixo ? (
+          <div>
+            <span className={fieldLabelClassName}>Pontos</span>
+            <p className="mt-2 flex min-h-11 items-center rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-700">
+              {formData.pontos} pontos (valor fixo)
+            </p>
+          </div>
+        ) : (
+          <div>
+            <label htmlFor="pontos" className={fieldLabelClassName}>Pontos</label>
+            <input
+              id="pontos"
+              type="number"
+              name="pontos"
+              value={formData.pontos}
+              onChange={handleInputChange}
+              min={formData.valorMinimo || 0}
+              max={formData.valorMaximo || 100}
+              className={fieldControlClassName}
+              required
+            />
+          </div>
+        )}
 
-      {/* Pontos */}
-      {tipoRegra?.fixo ? (
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Pontos
-          </label>
-          <p className="mt-1 text-gray-600">
-            {formData.pontos} pontos (valor fixo)
-          </p>
-        </div>
-      ) : (
-        <div>
-          <label htmlFor="pontos" className="block text-sm font-medium text-gray-700">
-            Pontos
-          </label>
-          <input
-            id="pontos"
-            type="number"
-            name="pontos"
-            value={formData.pontos}
-            onChange={handleInputChange}
-            min={formData.valorMinimo || 0}
-            max={formData.valorMaximo || 100}
-            className="w-full mt-1 p-2 border rounded"
-            required
-          />
-        </div>
-      )}
-
-      {/* Matrícula do Aluno */}
-      {tipoRegra?.temAluno && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Matrícula do Aluno
-          </label>
-          <input
-            type="text"
-            name="matriculaAluno"
-            value={formData.matriculaAluno}
-            onChange={handleInputChange}
-            maxLength={15}
-            className="w-full mt-1 p-2 border rounded"
-          />
-        </div>
-      )}
+        {/* Matrícula do Aluno */}
+        {tipoRegra?.temAluno && (
+          <div>
+            <label htmlFor="matriculaAluno" className={fieldLabelClassName}>
+              Matrícula do Aluno
+            </label>
+            <input
+              id="matriculaAluno"
+              type="text"
+              name="matriculaAluno"
+              value={formData.matriculaAluno}
+              onChange={handleInputChange}
+              maxLength={15}
+              className={fieldControlClassName}
+            />
+          </div>
+        )}
+      </div>
 
       {/* Motivação */}
       <div>
-        <label htmlFor="motivacao" className="block text-sm font-medium text-gray-700">
-          Motivação
-        </label>
+        <label htmlFor="motivacao" className={fieldLabelClassName}>Motivação</label>
         <textarea
           id="motivacao"
           name="motivacao"
           value={formData.motivacao}
           onChange={handleInputChange}
-          className="w-full mt-1 p-2 border rounded"
+          className={`${fieldControlClassName} min-h-24 resize-y`}
           rows="3"
         ></textarea>
       </div>
 
       {/* Submit Button */}
-      <div>
+      <div className="flex justify-end border-t border-gray-200 pt-5">
         <button
           type="submit"
-          className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto"
         >
+          <FaCircleCheck className="h-4 w-4" aria-hidden="true" />
           Registrar Pontuação
         </button>
       </div>

@@ -158,9 +158,9 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   };
 
   return (
-    <div className="relative mt-1" ref={containerRef}>
+    <div className="relative mt-2" ref={containerRef}>
       {selectedHasIcon && (
-        <span className="pointer-events-none absolute left-3 top-5 z-10 flex -translate-y-1/2 gap-1">
+        <span className="pointer-events-none absolute left-3 top-[22px] z-10 flex -translate-y-1/2 gap-1">
           {selectedOperation && (
             <RuleOperationIcon operation={selectedRule.operacao} announce />
           )}
@@ -181,7 +181,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
         aria-label="Buscar regra pela descrição ou categoria"
         autoComplete="off"
         autoCorrect="off"
-        className={`w-full border rounded p-2 ${selectedHasIcon ? selectedInputPadding : ""}`}
+        className={`min-h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 ${selectedHasIcon ? selectedInputPadding : ""}`}
         onChange={(event) => {
           editingRef.current = true;
           setSearchTerm(event.target.value);
@@ -207,12 +207,12 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
           id="rule-options"
           role="listbox"
           aria-label="Regras disponíveis"
-          className="absolute z-10 w-full max-h-72 overflow-y-auto mt-1 bg-white border rounded shadow-lg"
+          className="absolute z-20 mt-2 max-h-80 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-xl"
         >
           {groups.length > 0 ? (
             groups.map(([groupName, groupedRules]) => (
               <section key={groupName} aria-label={groupName}>
-                <h3 className="px-3 py-2 text-sm font-semibold text-gray-700 bg-gray-100">
+                <h3 className="sticky top-0 z-10 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-700">
                   {groupName}
                 </h3>
                 {groupedRules.map((rule) => {
@@ -234,7 +234,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
                       aria-label={displayDescription}
                       aria-selected={ruleIndex === activeIndex}
                       aria-describedby={descriptionIds.join(" ") || undefined}
-                      className={`flex w-full items-start gap-2 px-3 py-2 text-left transition-colors duration-150 ${
+                      className={`flex min-h-11 w-full items-start gap-2 px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
                         operation?.hoverClassName || "hover:bg-gray-50"
                       } ${
                         ruleIndex === activeIndex

@@ -59,6 +59,15 @@ describe("apresentação TURBO", () => {
 });
 
 describe("RuleSelect", () => {
+  it("desativa sugestões automáticas do navegador no campo de busca", () => {
+    render(<RuleSelect rules={rules} selectedRuleId="" onChange={jest.fn()} />);
+
+    const search = screen.getByRole("combobox", { name: /buscar regra/i });
+    expect(search).toHaveAttribute("autocomplete", "off");
+    expect(search).toHaveAttribute("autocorrect", "off");
+    expect(search).toHaveAttribute("spellcheck", "false");
+  });
+
   it("mostra as regras disponíveis agrupadas por contexto", async () => {
     const user = userEvent.setup();
     render(<RuleSelect rules={rules} selectedRuleId="" onChange={jest.fn()} />);

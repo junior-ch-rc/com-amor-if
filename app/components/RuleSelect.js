@@ -179,6 +179,8 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
         aria-controls="rule-options"
         aria-expanded={isOpen}
         aria-label="Buscar regra pela descrição ou categoria"
+        autoComplete="off"
+        autoCorrect="off"
         className={`w-full border rounded p-2 ${selectedHasIcon ? selectedInputPadding : ""}`}
         onChange={(event) => {
           editingRef.current = true;
@@ -194,6 +196,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
         onKeyDown={handleKeyDown}
         placeholder="Digite a descrição ou categoria"
         role="combobox"
+        spellCheck={false}
         type="search"
         value={searchTerm}
         required

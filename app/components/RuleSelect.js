@@ -1,8 +1,45 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FaCircleMinus, FaCirclePlus } from "react-icons/fa6";
 
 export const UNGROUPED_RULES_LABEL = "Outras regras";
+
+const OPERATION_DETAILS = {
+  SUM: {
+    Icon: FaCirclePlus,
+    label: "Operação de adição",
+    iconClassName: "text-green-600",
+    hoverClassName: "hover:bg-green-50",
+    activeClassName: "bg-green-50",
+  },
+  SUB: {
+    Icon: FaCircleMinus,
+    label: "Operação de subtração",
+    iconClassName: "text-red-600",
+    hoverClassName: "hover:bg-red-50",
+    activeClassName: "bg-red-50",
+  },
+};
+
+const RuleOperationIcon = ({ operation, announce = false }) => {
+  const details = OPERATION_DETAILS[operation];
+
+  if (!details) return <span className="h-5 w-5 shrink-0" aria-hidden="true" />;
+
+  const { Icon, iconClassName, label } = details;
+  return (
+    <span
+      className={`flex h-5 w-5 shrink-0 items-center justify-center ${iconClassName}`}
+      role={announce ? "img" : undefined}
+      aria-label={announce ? label : undefined}
+      aria-hidden={announce ? undefined : "true"}
+      title={announce ? label : undefined}
+    >
+      <Icon className="h-5 w-5" />
+    </span>
+  );
+};
 
 const normalizeSearchValue = (value = "") =>
   (value ?? "")
@@ -39,6 +76,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
     );
   }, [rules, searchTerm]);
   const groups = Object.entries(groupRulesByCategory(filteredRules));
+  const selectedOperation = OPERATION_DETAILS[selectedRule?.operacao];
 
   useEffect(() => {
     if (selectedRule) {
@@ -97,6 +135,11 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
 
   return (
     <div className="relative mt-1" ref={containerRef}>
+      {selectedOperation && (
+        <span className="pointer-events-none absolute left-3 top-5 z-10 -translate-y-1/2">
+          <RuleOperationIcon operation={selectedRule.operacao} announce />
+        </span>
+      )}
       <input
         ref={inputRef}
         id="regra"
@@ -109,7 +152,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
         aria-controls="rule-options"
         aria-expanded={isOpen}
         aria-label="Buscar regra pela descrição ou categoria"
-        className="w-full p-2 border rounded"
+        className={`w-full border rounded p-2 ${selectedOperation ? "pl-10" : ""}`}
         onChange={(event) => {
           editingRef.current = true;
           setSearchTerm(event.target.value);
@@ -144,20 +187,36 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
                 </h3>
                 {groupedRules.map((rule) => {
                   const ruleIndex = filteredRules.indexOf(rule);
+                  const operation = OPERATION_DETAILS[rule.operacao];
+                  const operationDescriptionId = `rule-operation-${rule.id}`;
                   return (
                     <button
                       id={`rule-option-${rule.id}`}
                       type="button"
                       role="option"
+                      aria-label={rule.descricao}
                       aria-selected={ruleIndex === activeIndex}
-                      className={`block w-full px-3 py-2 text-left hover:bg-blue-50 ${
-                        ruleIndex === activeIndex ? "bg-blue-50" : ""
+                      aria-describedby={operation ? operationDescriptionId : undefined}
+                      className={`flex w-full items-start gap-2 px-3 py-2 text-left transition-colors duration-150 ${
+                        operation?.hoverClassName || "hover:bg-gray-50"
+                      } ${
+                        ruleIndex === activeIndex
+                          ? operation?.activeClassName || "bg-gray-50"
+                          : ""
                       }`}
                       key={rule.id}
                       onMouseEnter={() => setActiveIndex(ruleIndex)}
                       onClick={() => handleSelect(rule)}
                     >
-                      {rule.descricao}
+                      <RuleOperationIcon operation={rule.operacao} />
+                      <span className="min-w-0 flex-1 leading-snug">
+                        {rule.descricao}
+                      </span>
+                      {operation && (
+                        <span id={operationDescriptionId} className="sr-only">
+                          {operation.label}.
+                        </span>
+                      )}
                     </button>
                   );
                 })}

@@ -11,19 +11,22 @@ const rules = [
     descricao: "Organização dos materiais",
     categoria: "Rotina",
     grupo: "exclusividade-organização",
+    operacao: "SUM",
   },
   {
     id: 2,
     descricao: "Livro devolvido no prazo",
     categoria: "Biblioteca",
     grupo: "exclusividade-acervo",
+    operacao: "SUB",
   },
   {
     id: 3,
     descricao: "Uso adequado do laboratório",
     categoria: "Laboratório",
+    operacao: "SUM",
   },
-  { id: 4, descricao: "Participação em evento", categoria: null },
+  { id: 4, descricao: "Participação em evento", categoria: null, operacao: "SUM" },
 ];
 
 describe("groupRulesByCategory", () => {
@@ -53,6 +56,25 @@ describe("RuleSelect", () => {
     expect(
       screen.queryByRole("heading", { name: "exclusividade-organização" })
     ).not.toBeInTheDocument();
+  });
+
+  it("diferencia visual e semanticamente operações de adição e subtração", async () => {
+    const user = userEvent.setup();
+    render(<RuleSelect rules={rules} selectedRuleId="" onChange={jest.fn()} />);
+
+    await user.click(screen.getByRole("combobox", { name: /buscar regra/i }));
+
+    const addition = screen.getByRole("option", {
+      name: "Organização dos materiais",
+    });
+    const subtraction = screen.getByRole("option", {
+      name: "Livro devolvido no prazo",
+    });
+
+    expect(addition).toHaveAccessibleDescription("Operação de adição.");
+    expect(addition).toHaveClass("hover:bg-green-50");
+    expect(subtraction).toHaveAccessibleDescription("Operação de subtração.");
+    expect(subtraction).toHaveClass("hover:bg-red-50");
   });
 
   it("busca pela descrição sem diferenciar maiúsculas, minúsculas ou acentos", async () => {
@@ -115,6 +137,14 @@ describe("RuleSelect", () => {
       "Livro devolvido no prazo"
     );
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("mantém o ícone da operação visível no campo após a seleção", () => {
+    render(<RuleSelect rules={rules} selectedRuleId="2" onChange={jest.fn()} />);
+
+    expect(
+      screen.getByRole("img", { name: "Operação de subtração" })
+    ).toBeInTheDocument();
   });
 
   it("permite navegar e selecionar pelo teclado", async () => {

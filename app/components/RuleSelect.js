@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FaCircleMinus, FaCirclePlus } from "react-icons/fa6";
+import { FaCircleMinus, FaCirclePlus, FaRocket } from "react-icons/fa6";
 
 export const UNGROUPED_RULES_LABEL = "Outras regras";
+export const isTurboRule = (rule) => Number(rule?.valorMinimo) >= 30;
+export const getRuleDisplayDescription = (description = "") =>
+  description.replace(/^\s*\[TURBO\]\s*/i, "").trim();
 
 const OPERATION_DETAILS = {
   SUM: {
@@ -41,6 +44,18 @@ const RuleOperationIcon = ({ operation, announce = false }) => {
   );
 };
 
+const RuleTurboIcon = ({ announce = false }) => (
+  <span
+    className="flex h-5 w-5 shrink-0 items-center justify-center text-amber-600"
+    role={announce ? "img" : undefined}
+    aria-label={announce ? "Regra TURBO" : undefined}
+    aria-hidden={announce ? undefined : "true"}
+    title={announce ? "Regra TURBO" : undefined}
+  >
+    <FaRocket className="h-4 w-4" />
+  </span>
+);
+
 const normalizeSearchValue = (value = "") =>
   (value ?? "")
     .normalize("NFD")
@@ -70,17 +85,24 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   const filteredRules = useMemo(() => {
     const normalizedSearch = normalizeSearchValue(searchTerm);
     return rules.filter((rule) =>
-      [rule.descricao, rule.categoria].some((value) =>
+      [
+        getRuleDisplayDescription(rule.descricao),
+        rule.categoria,
+        isTurboRule(rule) ? "turbo" : "",
+      ].some((value) =>
         normalizeSearchValue(value).includes(normalizedSearch)
       )
     );
   }, [rules, searchTerm]);
   const groups = Object.entries(groupRulesByCategory(filteredRules));
   const selectedOperation = OPERATION_DETAILS[selectedRule?.operacao];
+  const selectedIsTurbo = isTurboRule(selectedRule);
+  const selectedHasIcon = selectedOperation || selectedIsTurbo;
+  const selectedInputPadding = selectedOperation && selectedIsTurbo ? "pl-16" : "pl-10";
 
   useEffect(() => {
     if (selectedRule) {
-      setSearchTerm(selectedRule.descricao);
+      setSearchTerm(getRuleDisplayDescription(selectedRule.descricao));
       editingRef.current = false;
     } else if (previousSelectedRuleIdRef.current && !editingRef.current) {
       setSearchTerm("");
@@ -98,7 +120,9 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
     const closeOnOutsideClick = (event) => {
       if (!containerRef.current?.contains(event.target)) {
         setIsOpen(false);
-        if (selectedRule) setSearchTerm(selectedRule.descricao);
+        if (selectedRule) {
+          setSearchTerm(getRuleDisplayDescription(selectedRule.descricao));
+        }
       }
     };
     document.addEventListener("mousedown", closeOnOutsideClick);
@@ -108,14 +132,14 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   const handleSelect = (rule) => {
     editingRef.current = false;
     onChange(String(rule.id));
-    setSearchTerm(rule.descricao);
+    setSearchTerm(getRuleDisplayDescription(rule.descricao));
     setIsOpen(false);
   };
 
   const handleKeyDown = (event) => {
     if (event.key === "Escape") {
       setIsOpen(false);
-      setSearchTerm(selectedRule?.descricao || "");
+      setSearchTerm(getRuleDisplayDescription(selectedRule?.descricao));
       return;
     }
     if (!filteredRules.length) return;
@@ -135,9 +159,12 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
 
   return (
     <div className="relative mt-1" ref={containerRef}>
-      {selectedOperation && (
-        <span className="pointer-events-none absolute left-3 top-5 z-10 -translate-y-1/2">
-          <RuleOperationIcon operation={selectedRule.operacao} announce />
+      {selectedHasIcon && (
+        <span className="pointer-events-none absolute left-3 top-5 z-10 flex -translate-y-1/2 gap-1">
+          {selectedOperation && (
+            <RuleOperationIcon operation={selectedRule.operacao} announce />
+          )}
+          {selectedIsTurbo && <RuleTurboIcon announce />}
         </span>
       )}
       <input
@@ -152,7 +179,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
         aria-controls="rule-options"
         aria-expanded={isOpen}
         aria-label="Buscar regra pela descrição ou categoria"
-        className={`w-full border rounded p-2 ${selectedOperation ? "pl-10" : ""}`}
+        className={`w-full border rounded p-2 ${selectedHasIcon ? selectedInputPadding : ""}`}
         onChange={(event) => {
           editingRef.current = true;
           setSearchTerm(event.target.value);
@@ -188,15 +215,22 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
                 {groupedRules.map((rule) => {
                   const ruleIndex = filteredRules.indexOf(rule);
                   const operation = OPERATION_DETAILS[rule.operacao];
+                  const turbo = isTurboRule(rule);
+                  const displayDescription = getRuleDisplayDescription(rule.descricao);
                   const operationDescriptionId = `rule-operation-${rule.id}`;
+                  const turboDescriptionId = `rule-turbo-${rule.id}`;
+                  const descriptionIds = [
+                    operation ? operationDescriptionId : null,
+                    turbo ? turboDescriptionId : null,
+                  ].filter(Boolean);
                   return (
                     <button
                       id={`rule-option-${rule.id}`}
                       type="button"
                       role="option"
-                      aria-label={rule.descricao}
+                      aria-label={displayDescription}
                       aria-selected={ruleIndex === activeIndex}
-                      aria-describedby={operation ? operationDescriptionId : undefined}
+                      aria-describedby={descriptionIds.join(" ") || undefined}
                       className={`flex w-full items-start gap-2 px-3 py-2 text-left transition-colors duration-150 ${
                         operation?.hoverClassName || "hover:bg-gray-50"
                       } ${
@@ -209,12 +243,18 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
                       onClick={() => handleSelect(rule)}
                     >
                       <RuleOperationIcon operation={rule.operacao} />
+                      {turbo && <RuleTurboIcon />}
                       <span className="min-w-0 flex-1 leading-snug">
-                        {rule.descricao}
+                        {displayDescription}
                       </span>
                       {operation && (
                         <span id={operationDescriptionId} className="sr-only">
                           {operation.label}.
+                        </span>
+                      )}
+                      {turbo && (
+                        <span id={turboDescriptionId} className="sr-only">
+                          Regra TURBO.
                         </span>
                       )}
                     </button>

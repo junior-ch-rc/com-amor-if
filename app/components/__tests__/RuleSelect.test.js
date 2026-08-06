@@ -2,7 +2,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RuleSelect, {
   UNGROUPED_RULES_LABEL,
+  getRuleDisplayDescription,
   groupRulesByCategory,
+  isTurboRule,
 } from "../RuleSelect";
 
 const rules = [
@@ -26,7 +28,13 @@ const rules = [
     categoria: "Laboratório",
     operacao: "SUM",
   },
-  { id: 4, descricao: "Participação em evento", categoria: null, operacao: "SUM" },
+  {
+    id: 4,
+    descricao: "[TURBO] Participação em evento",
+    categoria: null,
+    operacao: "SUM",
+    valorMinimo: 30,
+  },
 ];
 
 describe("groupRulesByCategory", () => {
@@ -37,6 +45,16 @@ describe("groupRulesByCategory", () => {
       Laboratório: [rules[2]],
       [UNGROUPED_RULES_LABEL]: [rules[3]],
     });
+  });
+});
+
+describe("apresentação TURBO", () => {
+  it("deriva o destaque do valor mínimo e remove o marcador da exibição", () => {
+    expect(isTurboRule({ valorMinimo: 30 })).toBe(true);
+    expect(isTurboRule({ valorMinimo: 29 })).toBe(false);
+    expect(getRuleDisplayDescription("[TURBO] Regra especial")).toBe(
+      "Regra especial"
+    );
   });
 });
 
@@ -75,6 +93,32 @@ describe("RuleSelect", () => {
     expect(addition).toHaveClass("hover:bg-green-50");
     expect(subtraction).toHaveAccessibleDescription("Operação de subtração.");
     expect(subtraction).toHaveClass("hover:bg-red-50");
+  });
+
+  it("substitui o marcador TURBO por um foguete e permite buscar pelo destaque", async () => {
+    const user = userEvent.setup();
+    render(<RuleSelect rules={rules} selectedRuleId="" onChange={jest.fn()} />);
+
+    const search = screen.getByRole("combobox", { name: /buscar regra/i });
+    await user.click(search);
+    await user.type(search, "turbo");
+
+    const turboOption = screen.getByRole("option", {
+      name: "Participação em evento",
+    });
+    expect(turboOption).toHaveAccessibleDescription(
+      "Operação de adição. Regra TURBO."
+    );
+    expect(turboOption).not.toHaveTextContent("[TURBO]");
+  });
+
+  it("mantém o foguete no campo selecionado sem exibir o marcador textual", () => {
+    render(<RuleSelect rules={rules} selectedRuleId="4" onChange={jest.fn()} />);
+
+    expect(screen.getByRole("img", { name: "Regra TURBO" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: /buscar regra/i })).toHaveValue(
+      "Participação em evento"
+    );
   });
 
   it("busca pela descrição sem diferenciar maiúsculas, minúsculas ou acentos", async () => {

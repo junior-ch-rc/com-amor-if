@@ -115,8 +115,10 @@ describe("RuleSelect", () => {
 
     expect(addition).toHaveAccessibleDescription("Operação de adição.");
     expect(addition).toHaveClass("hover:bg-green-50");
+    expect(addition).toHaveClass("items-center");
     expect(subtraction).toHaveAccessibleDescription("Operação de subtração.");
     expect(subtraction).toHaveClass("hover:bg-red-50");
+    expect(subtraction).toHaveClass("items-center");
   });
 
   it("substitui o marcador TURBO por um foguete e permite buscar pelo destaque", async () => {

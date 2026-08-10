@@ -241,7 +241,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
                       aria-label={displayDescription}
                       aria-selected={ruleIndex === activeIndex}
                       aria-describedby={descriptionIds.join(" ") || undefined}
-                      className={`flex min-h-11 w-full items-start gap-2 px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
+                      className={`flex min-h-11 w-full items-center gap-2 px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
                         operation?.hoverClassName || "hover:bg-gray-50"
                       } ${
                         ruleIndex === activeIndex

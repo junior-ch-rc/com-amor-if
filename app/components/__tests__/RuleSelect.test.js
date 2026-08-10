@@ -5,6 +5,7 @@ import RuleSelect, {
   getRuleDisplayDescription,
   groupRulesByCategory,
   isTurboRule,
+  orderRuleGroups,
 } from "../RuleSelect";
 
 const rules = [
@@ -45,6 +46,20 @@ describe("groupRulesByCategory", () => {
       Laboratório: [rules[2]],
       [UNGROUPED_RULES_LABEL]: [rules[3]],
     });
+  });
+
+  it("mantém a categoria Outros por último", () => {
+    const groups = [
+      ["Rotina", [rules[0]]],
+      ["Outros", [rules[1]]],
+      ["Biblioteca", [rules[2]]],
+    ];
+
+    expect(orderRuleGroups(groups).map(([groupName]) => groupName)).toEqual([
+      "Rotina",
+      "Biblioteca",
+      "Outros",
+    ]);
   });
 });
 

@@ -72,6 +72,11 @@ export const groupRulesByCategory = (rules = []) =>
     return groups;
   }, {});
 
+export const orderRuleGroups = (groups = []) => [
+  ...groups.filter(([groupName]) => groupName !== "Outros"),
+  ...groups.filter(([groupName]) => groupName === "Outros"),
+];
+
 const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   const containerRef = useRef(null);
   const inputRef = useRef(null);
@@ -94,7 +99,9 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
       )
     );
   }, [rules, searchTerm]);
-  const groups = Object.entries(groupRulesByCategory(filteredRules));
+  const groups = orderRuleGroups(
+    Object.entries(groupRulesByCategory(filteredRules))
+  );
   const selectedOperation = OPERATION_DETAILS[selectedRule?.operacao];
   const selectedIsTurbo = isTurboRule(selectedRule);
   const selectedHasIcon = selectedOperation || selectedIsTurbo;

@@ -80,7 +80,9 @@ export const orderRuleGroups = (groups = []) => [
 const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  const activeOptionRef = useRef(null);
   const editingRef = useRef(false);
+  const keyboardNavigationRef = useRef(false);
   const previousSelectedRuleIdRef = useRef(selectedRuleId);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -125,6 +127,13 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   }, [selectedRule]);
 
   useEffect(() => {
+    if (!keyboardNavigationRef.current || !isOpen) return;
+
+    activeOptionRef.current?.scrollIntoView?.({ block: "nearest" });
+    keyboardNavigationRef.current = false;
+  }, [activeIndex, isOpen]);
+
+  useEffect(() => {
     const closeOnOutsideClick = (event) => {
       if (!containerRef.current?.contains(event.target)) {
         setIsOpen(false);
@@ -153,6 +162,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
     if (!displayedRules.length) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
+      keyboardNavigationRef.current = true;
       setIsOpen(true);
       const direction = event.key === "ArrowDown" ? 1 : -1;
       setActiveIndex((current) =>
@@ -236,6 +246,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
                   ].filter(Boolean);
                   return (
                     <button
+                      ref={ruleIndex === activeIndex ? activeOptionRef : null}
                       id={`rule-option-${rule.id}`}
                       type="button"
                       role="option"

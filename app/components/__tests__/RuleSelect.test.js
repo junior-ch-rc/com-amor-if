@@ -115,8 +115,10 @@ describe("RuleSelect", () => {
 
     expect(addition).toHaveAccessibleDescription("Operação de adição.");
     expect(addition).toHaveClass("hover:bg-green-50");
+    expect(addition).toHaveClass("items-center");
     expect(subtraction).toHaveAccessibleDescription("Operação de subtração.");
     expect(subtraction).toHaveClass("hover:bg-red-50");
+    expect(subtraction).toHaveClass("items-center");
   });
 
   it("substitui o marcador TURBO por um foguete e permite buscar pelo destaque", async () => {
@@ -226,6 +228,81 @@ describe("RuleSelect", () => {
 
     expect(onChange).toHaveBeenCalledWith("2");
     expect(search).toHaveValue("Livro devolvido no prazo");
+  });
+
+  it("mantém a opção ativa visível durante a navegação pelo teclado", async () => {
+    const scrollIntoView = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    const user = userEvent.setup();
+    render(<RuleSelect rules={rules} selectedRuleId="" onChange={jest.fn()} />);
+
+    const search = screen.getByRole("combobox", { name: /buscar regra/i });
+    await user.click(search);
+    await user.keyboard("{ArrowDown}");
+
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest" });
+
+    delete window.HTMLElement.prototype.scrollIntoView;
+  });
+
+  it("exibe a primeira opção por inteiro ao reiniciar a navegação circular", async () => {
+    const scrollIntoView = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    const user = userEvent.setup();
+    render(<RuleSelect rules={rules} selectedRuleId="" onChange={jest.fn()} />);
+
+    const search = screen.getByRole("combobox", { name: /buscar regra/i });
+    await user.click(search);
+    await user.keyboard(
+      "{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}"
+    );
+
+    expect(scrollIntoView).toHaveBeenLastCalledWith({ block: "center" });
+    expect(search).toHaveAttribute("aria-activedescendant", "rule-option-1");
+
+    delete window.HTMLElement.prototype.scrollIntoView;
+  });
+
+  it("exibe a primeira opção por inteiro ao voltar pelas opções anteriores", async () => {
+    const scrollIntoView = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    const user = userEvent.setup();
+    render(<RuleSelect rules={rules} selectedRuleId="" onChange={jest.fn()} />);
+
+    const search = screen.getByRole("combobox", { name: /buscar regra/i });
+    await user.click(search);
+    await user.keyboard(
+      "{ArrowDown}{ArrowDown}{ArrowDown}{ArrowUp}{ArrowUp}{ArrowUp}"
+    );
+
+    expect(scrollIntoView).toHaveBeenLastCalledWith({ block: "center" });
+    expect(search).toHaveAttribute("aria-activedescendant", "rule-option-1");
+
+    delete window.HTMLElement.prototype.scrollIntoView;
+  });
+
+  it("segue pelo teclado a mesma ordem exibida quando Outros fica por último", async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    const rulesWithOthersInTheMiddle = [
+      rules[0],
+      { ...rules[1], categoria: "Outros" },
+      rules[2],
+    ];
+    render(
+      <RuleSelect
+        rules={rulesWithOthersInTheMiddle}
+        selectedRuleId=""
+        onChange={onChange}
+      />
+    );
+
+    const search = screen.getByRole("combobox", { name: /buscar regra/i });
+    await user.click(search);
+    await user.keyboard("{ArrowDown}{Enter}");
+
+    expect(onChange).toHaveBeenCalledWith("3");
+    expect(search).toHaveValue("Uso adequado do laboratório");
   });
 
   it("limpa uma seleção anterior quando o usuário edita o texto", async () => {

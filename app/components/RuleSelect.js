@@ -80,7 +80,10 @@ export const orderRuleGroups = (groups = []) => [
 const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  const activeOptionRef = useRef(null);
   const editingRef = useRef(false);
+  const keyboardNavigationRef = useRef(false);
+  const keyboardScrollBlockRef = useRef("nearest");
   const previousSelectedRuleIdRef = useRef(selectedRuleId);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -102,6 +105,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   const groups = orderRuleGroups(
     Object.entries(groupRulesByCategory(filteredRules))
   );
+  const displayedRules = groups.flatMap(([, groupedRules]) => groupedRules);
   const selectedOperation = OPERATION_DETAILS[selectedRule?.operacao];
   const selectedIsTurbo = isTurboRule(selectedRule);
   const selectedHasIcon = selectedOperation || selectedIsTurbo;
@@ -122,6 +126,15 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
       selectedRule ? "" : "Selecione uma regra da lista."
     );
   }, [selectedRule]);
+
+  useEffect(() => {
+    if (!keyboardNavigationRef.current || !isOpen) return;
+
+    activeOptionRef.current?.scrollIntoView?.({
+      block: keyboardScrollBlockRef.current,
+    });
+    keyboardNavigationRef.current = false;
+  }, [activeIndex, isOpen]);
 
   useEffect(() => {
     const closeOnOutsideClick = (event) => {
@@ -149,25 +162,33 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
       setSearchTerm(getRuleDisplayDescription(selectedRule?.descricao));
       return;
     }
-    if (!filteredRules.length) return;
+    if (!displayedRules.length) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
+      keyboardNavigationRef.current = true;
       setIsOpen(true);
       const direction = event.key === "ArrowDown" ? 1 : -1;
-      setActiveIndex((current) =>
-        (current + direction + filteredRules.length) % filteredRules.length
-      );
+      setActiveIndex((current) => {
+        const next =
+          (current + direction + displayedRules.length) % displayedRules.length;
+        const wrapped =
+          (direction === 1 && next === 0) ||
+          (direction === -1 && next === displayedRules.length - 1);
+        keyboardScrollBlockRef.current =
+          wrapped || next === 0 ? "center" : "nearest";
+        return next;
+      });
     }
     if (event.key === "Enter" && isOpen) {
       event.preventDefault();
-      handleSelect(filteredRules[activeIndex] || filteredRules[0]);
+      handleSelect(displayedRules[activeIndex] || displayedRules[0]);
     }
   };
 
   return (
-    <div className="relative mt-1" ref={containerRef}>
+    <div className="relative mt-2" ref={containerRef}>
       {selectedHasIcon && (
-        <span className="pointer-events-none absolute left-3 top-5 z-10 flex -translate-y-1/2 gap-1">
+        <span className="pointer-events-none absolute left-3 top-[22px] z-10 flex -translate-y-1/2 gap-1">
           {selectedOperation && (
             <RuleOperationIcon operation={selectedRule.operacao} announce />
           )}
@@ -178,8 +199,8 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
         ref={inputRef}
         id="regra"
         aria-activedescendant={
-          isOpen && filteredRules[activeIndex]
-            ? `rule-option-${filteredRules[activeIndex].id}`
+          isOpen && displayedRules[activeIndex]
+            ? `rule-option-${displayedRules[activeIndex].id}`
             : undefined
         }
         aria-autocomplete="list"
@@ -188,7 +209,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
         aria-label="Buscar regra pela descrição ou categoria"
         autoComplete="off"
         autoCorrect="off"
-        className={`w-full border rounded p-2 ${selectedHasIcon ? selectedInputPadding : ""}`}
+        className={`min-h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 ${selectedHasIcon ? selectedInputPadding : ""}`}
         onChange={(event) => {
           editingRef.current = true;
           setSearchTerm(event.target.value);
@@ -197,7 +218,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
           if (selectedRuleId) onChange("");
         }}
         onFocus={() => {
-          setActiveIndex(Math.max(0, filteredRules.indexOf(selectedRule)));
+          setActiveIndex(Math.max(0, displayedRules.indexOf(selectedRule)));
           setIsOpen(true);
         }}
         onKeyDown={handleKeyDown}
@@ -214,16 +235,16 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
           id="rule-options"
           role="listbox"
           aria-label="Regras disponíveis"
-          className="absolute z-10 w-full max-h-72 overflow-y-auto mt-1 bg-white border rounded shadow-lg"
+          className="absolute z-20 mt-2 max-h-80 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-xl"
         >
           {groups.length > 0 ? (
             groups.map(([groupName, groupedRules]) => (
               <section key={groupName} aria-label={groupName}>
-                <h3 className="px-3 py-2 text-sm font-semibold text-gray-700 bg-gray-100">
+                <h3 className="sticky top-0 z-10 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-700">
                   {groupName}
                 </h3>
                 {groupedRules.map((rule) => {
-                  const ruleIndex = filteredRules.indexOf(rule);
+                  const ruleIndex = displayedRules.indexOf(rule);
                   const operation = OPERATION_DETAILS[rule.operacao];
                   const turbo = isTurboRule(rule);
                   const displayDescription = getRuleDisplayDescription(rule.descricao);
@@ -235,13 +256,14 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
                   ].filter(Boolean);
                   return (
                     <button
+                      ref={ruleIndex === activeIndex ? activeOptionRef : null}
                       id={`rule-option-${rule.id}`}
                       type="button"
                       role="option"
                       aria-label={displayDescription}
                       aria-selected={ruleIndex === activeIndex}
                       aria-describedby={descriptionIds.join(" ") || undefined}
-                      className={`flex w-full items-start gap-2 px-3 py-2 text-left transition-colors duration-150 ${
+                      className={`flex min-h-11 w-full items-center gap-2 px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
                         operation?.hoverClassName || "hover:bg-gray-50"
                       } ${
                         ruleIndex === activeIndex

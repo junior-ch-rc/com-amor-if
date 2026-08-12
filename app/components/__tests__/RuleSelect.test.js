@@ -245,6 +245,24 @@ describe("RuleSelect", () => {
     delete window.HTMLElement.prototype.scrollIntoView;
   });
 
+  it("exibe a primeira opção por inteiro ao reiniciar a navegação circular", async () => {
+    const scrollIntoView = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    const user = userEvent.setup();
+    render(<RuleSelect rules={rules} selectedRuleId="" onChange={jest.fn()} />);
+
+    const search = screen.getByRole("combobox", { name: /buscar regra/i });
+    await user.click(search);
+    await user.keyboard(
+      "{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}"
+    );
+
+    expect(scrollIntoView).toHaveBeenLastCalledWith({ block: "center" });
+    expect(search).toHaveAttribute("aria-activedescendant", "rule-option-1");
+
+    delete window.HTMLElement.prototype.scrollIntoView;
+  });
+
   it("segue pelo teclado a mesma ordem exibida quando Outros fica por último", async () => {
     const onChange = jest.fn();
     const user = userEvent.setup();

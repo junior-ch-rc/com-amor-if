@@ -83,6 +83,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   const activeOptionRef = useRef(null);
   const editingRef = useRef(false);
   const keyboardNavigationRef = useRef(false);
+  const keyboardScrollBlockRef = useRef("nearest");
   const previousSelectedRuleIdRef = useRef(selectedRuleId);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -129,7 +130,9 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   useEffect(() => {
     if (!keyboardNavigationRef.current || !isOpen) return;
 
-    activeOptionRef.current?.scrollIntoView?.({ block: "nearest" });
+    activeOptionRef.current?.scrollIntoView?.({
+      block: keyboardScrollBlockRef.current,
+    });
     keyboardNavigationRef.current = false;
   }, [activeIndex, isOpen]);
 
@@ -165,9 +168,15 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
       keyboardNavigationRef.current = true;
       setIsOpen(true);
       const direction = event.key === "ArrowDown" ? 1 : -1;
-      setActiveIndex((current) =>
-        (current + direction + displayedRules.length) % displayedRules.length
-      );
+      setActiveIndex((current) => {
+        const next =
+          (current + direction + displayedRules.length) % displayedRules.length;
+        const wrapped =
+          (direction === 1 && next === 0) ||
+          (direction === -1 && next === displayedRules.length - 1);
+        keyboardScrollBlockRef.current = wrapped ? "center" : "nearest";
+        return next;
+      });
     }
     if (event.key === "Enter" && isOpen) {
       event.preventDefault();

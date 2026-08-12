@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchPrivateData } from "../../utils/api";
 import { useAuth } from "../../providers/AuthProvider";
+import RuleSelect from "./RuleSelect";
 
 const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
   const { getToken } = useAuth();
@@ -71,23 +72,14 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Select Regra */}
+      {/* Seletor de Regra */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">Regra</label>
-        <select
-          name="idRegra"
-          value={formData.idRegra}
-          onChange={(e) => handleRegraChange(e.target.value)}
-          className="w-full mt-1 p-2 border rounded"
-          required
-        >
-          <option value="">Selecione uma regra</option>
-          {regras.map((regra) => (
-            <option key={regra.id} value={regra.id}>
-              {regra.descricao}
-            </option>
-          ))}
-        </select>
+        <label htmlFor="regra" className="block text-sm font-medium text-gray-700">Regra</label>
+        <RuleSelect
+          rules={regras}
+          selectedRuleId={formData.idRegra}
+          onChange={handleRegraChange}
+        />
       </div>
 
       {/* Indicativo de operação */}
@@ -108,10 +100,11 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
       {/* Select Turma ou Turno */}
       {tipoRegra?.porTurno ? (
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="turno" className="block text-sm font-medium text-gray-700">
             Turno
           </label>
           <select
+            id="turno"
             name="turno"
             value={formData.turno}
             onChange={handleInputChange}
@@ -125,10 +118,11 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
         </div>
       ) : (
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="turma" className="block text-sm font-medium text-gray-700">
             Turma
           </label>
           <select
+            id="turma"
             name="idTurma"
             value={formData.idTurma}
             onChange={handleInputChange}
@@ -148,10 +142,11 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
       {/* Select Bimestre */}
       {(tipoRegra?.frequencia !== 0 || tipoRegra?.bimestreExtra) && (
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="bimestre" className="block text-sm font-medium text-gray-700">
             Bimestre
           </label>
           <select
+            id="bimestre"
             name="bimestre"
             value={formData.bimestre}
             onChange={handleInputChange}
@@ -180,10 +175,11 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
         </div>
       ) : (
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="pontos" className="block text-sm font-medium text-gray-700">
             Pontos
           </label>
           <input
+            id="pontos"
             type="number"
             name="pontos"
             value={formData.pontos}
@@ -215,10 +211,11 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
 
       {/* Motivação */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor="motivacao" className="block text-sm font-medium text-gray-700">
           Motivação
         </label>
         <textarea
+          id="motivacao"
           name="motivacao"
           value={formData.motivacao}
           onChange={handleInputChange}

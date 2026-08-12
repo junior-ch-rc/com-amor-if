@@ -230,6 +230,30 @@ describe("RuleSelect", () => {
     expect(search).toHaveValue("Livro devolvido no prazo");
   });
 
+  it("segue pelo teclado a mesma ordem exibida quando Outros fica por último", async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    const rulesWithOthersInTheMiddle = [
+      rules[0],
+      { ...rules[1], categoria: "Outros" },
+      rules[2],
+    ];
+    render(
+      <RuleSelect
+        rules={rulesWithOthersInTheMiddle}
+        selectedRuleId=""
+        onChange={onChange}
+      />
+    );
+
+    const search = screen.getByRole("combobox", { name: /buscar regra/i });
+    await user.click(search);
+    await user.keyboard("{ArrowDown}{Enter}");
+
+    expect(onChange).toHaveBeenCalledWith("3");
+    expect(search).toHaveValue("Uso adequado do laboratório");
+  });
+
   it("limpa uma seleção anterior quando o usuário edita o texto", async () => {
     const onChange = jest.fn();
     const user = userEvent.setup();

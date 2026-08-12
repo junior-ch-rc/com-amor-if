@@ -102,6 +102,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
   const groups = orderRuleGroups(
     Object.entries(groupRulesByCategory(filteredRules))
   );
+  const displayedRules = groups.flatMap(([, groupedRules]) => groupedRules);
   const selectedOperation = OPERATION_DETAILS[selectedRule?.operacao];
   const selectedIsTurbo = isTurboRule(selectedRule);
   const selectedHasIcon = selectedOperation || selectedIsTurbo;
@@ -149,18 +150,18 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
       setSearchTerm(getRuleDisplayDescription(selectedRule?.descricao));
       return;
     }
-    if (!filteredRules.length) return;
+    if (!displayedRules.length) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       setIsOpen(true);
       const direction = event.key === "ArrowDown" ? 1 : -1;
       setActiveIndex((current) =>
-        (current + direction + filteredRules.length) % filteredRules.length
+        (current + direction + displayedRules.length) % displayedRules.length
       );
     }
     if (event.key === "Enter" && isOpen) {
       event.preventDefault();
-      handleSelect(filteredRules[activeIndex] || filteredRules[0]);
+      handleSelect(displayedRules[activeIndex] || displayedRules[0]);
     }
   };
 
@@ -178,8 +179,8 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
         ref={inputRef}
         id="regra"
         aria-activedescendant={
-          isOpen && filteredRules[activeIndex]
-            ? `rule-option-${filteredRules[activeIndex].id}`
+          isOpen && displayedRules[activeIndex]
+            ? `rule-option-${displayedRules[activeIndex].id}`
             : undefined
         }
         aria-autocomplete="list"
@@ -197,7 +198,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
           if (selectedRuleId) onChange("");
         }}
         onFocus={() => {
-          setActiveIndex(Math.max(0, filteredRules.indexOf(selectedRule)));
+          setActiveIndex(Math.max(0, displayedRules.indexOf(selectedRule)));
           setIsOpen(true);
         }}
         onKeyDown={handleKeyDown}
@@ -223,7 +224,7 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
                   {groupName}
                 </h3>
                 {groupedRules.map((rule) => {
-                  const ruleIndex = filteredRules.indexOf(rule);
+                  const ruleIndex = displayedRules.indexOf(rule);
                   const operation = OPERATION_DETAILS[rule.operacao];
                   const turbo = isTurboRule(rule);
                   const displayDescription = getRuleDisplayDescription(rule.descricao);

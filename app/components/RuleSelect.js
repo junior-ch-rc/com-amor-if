@@ -174,7 +174,8 @@ const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {
         const wrapped =
           (direction === 1 && next === 0) ||
           (direction === -1 && next === displayedRules.length - 1);
-        keyboardScrollBlockRef.current = wrapped ? "center" : "nearest";
+        keyboardScrollBlockRef.current =
+          wrapped || next === 0 ? "center" : "nearest";
         return next;
       });
     }

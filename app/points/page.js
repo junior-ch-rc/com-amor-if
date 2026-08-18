@@ -12,6 +12,8 @@ import { fetchPrivateData, postPrivateData } from "../../utils/api";
 import { useAuth } from "../../providers/AuthProvider";
 import PontuacaoForm from "../components/PontuacaoForm";
 import { isFromCategory } from "../../utils/role";
+import NoOpenSchoolYearNotice from "../components/NoOpenSchoolYearNotice";
+import { useOpenSchoolYear } from "../hooks/useOpenSchoolYear";
 
 // Cores para cada senso
 const SENSE_COLORS = {
@@ -34,13 +36,16 @@ const PointsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const token = getToken();
+  const {
+    hasOpenSchoolYear,
+    isLoading: isSchoolYearLoading,
+    error: schoolYearError,
+  } = useOpenSchoolYear(token, Boolean(user));
   const itemsPerPage = 10;
 
   const fetchPontuacoes = async () => {
     try {
-      const anos = await fetchPrivateData("anoletivo/anos", token);
-
-      if (anos.length > 0) {
+      if (hasOpenSchoolYear) {
         const data = await fetchPrivateData(
           "pontuacao/pontuacaoPorServidor",
           token
@@ -51,6 +56,8 @@ const PointsPage = () => {
           return acc;
         }, {});
         setPontuacoes(groupedBySenso);
+      } else {
+        setPontuacoes({});
       }
       
     } catch (error) {
@@ -170,17 +177,18 @@ const PointsPage = () => {
   };
 
   useEffect(() => {
-    if (user && !isLoading) {
+    if (user && !isLoading && !isSchoolYearLoading) {
       fetchRules();
       fetchPontuacoes();
     }
-  }, [user, isLoading, token]);
+  }, [user, isLoading, isSchoolYearLoading, hasOpenSchoolYear, token]);
 
   useEffect(() => {
     filterPontuacoes(searchTerm);
   }, [pontuacoes, activeTab]);
 
-  if (isLoading || isLoggingOut) return <LoadingSpinner />;
+  if (isLoading || isLoggingOut || isSchoolYearLoading)
+    return <LoadingSpinner />;
   if (
     !user ||
     (!isFromCategory(user, "Admin") && !isFromCategory(user, "Aval"))
@@ -206,16 +214,26 @@ const PointsPage = () => {
 
       <h1 className="text-2xl font-bold mb-4">Lançar Pontuação</h1>
 
-      <div className="overflow-x-auto flex flex-nowrap gap-2 border-b border-gray-300 mb-4">
-        <Tab
-          tabs={Object.keys(groupedRules)}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          tabColors={SENSE_COLORS}
-        />
-      </div>
+      {schoolYearError && (
+        <MessageBox message={schoolYearError} color="detail-minor" />
+      )}
 
-      {activeTab && (
+      {!schoolYearError && !hasOpenSchoolYear && (
+        <NoOpenSchoolYearNotice />
+      )}
+
+      {hasOpenSchoolYear && (
+        <div className="overflow-x-auto flex flex-nowrap gap-2 border-b border-gray-300 mb-4">
+          <Tab
+            tabs={Object.keys(groupedRules)}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            tabColors={SENSE_COLORS}
+          />
+        </div>
+      )}
+
+      {hasOpenSchoolYear && activeTab && (
         <div
           className="p-4 border rounded-md mt-4"
           style={{ borderColor: SENSE_COLORS[activeTab] || "#ccc" }}

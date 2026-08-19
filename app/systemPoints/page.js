@@ -11,6 +11,7 @@ import { isFromCategory } from "../../utils/role";
 import NotAuthorized from "../components/NotAuthorized";
 import { postPrivateData } from "@/utils/api";
 import NoOpenSchoolYearNotice from "../components/NoOpenSchoolYearNotice";
+import NoSchoolClassesNotice from "../components/NoSchoolClassesNotice";
 import { useOpenSchoolYear } from "../hooks/useOpenSchoolYear";
 
 const apiUrl = process.env.NEXT_PUBLIC_REACT_APP_API_URL;
@@ -28,6 +29,7 @@ const SystemPointsPage = () => {
   const token = getToken();
   const {
     hasOpenSchoolYear,
+    hasSchoolClasses,
     isLoading: isSchoolYearLoading,
     error: schoolYearError,
   } = useOpenSchoolYear(token, Boolean(user));
@@ -57,13 +59,13 @@ const SystemPointsPage = () => {
   useEffect(() => {
     if (isSchoolYearLoading) return;
 
-    if (hasOpenSchoolYear) {
+    if (hasOpenSchoolYear && hasSchoolClasses) {
       fetchData();
     } else {
       setTodasPontuacoes([]);
       setLoading(false);
     }
-  }, [hasOpenSchoolYear, isSchoolYearLoading]);
+  }, [hasOpenSchoolYear, hasSchoolClasses, isSchoolYearLoading]);
 
   if (isLoading || isLoggingOut || isSchoolYearLoading)
     return <LoadingSpinner />;
@@ -92,7 +94,7 @@ const SystemPointsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!hasOpenSchoolYear) return;
+    if (!hasOpenSchoolYear || !hasSchoolClasses) return;
     if (!token)
       return setMessages({ error: "Token de autenticação não encontrado" });
 
@@ -152,10 +154,17 @@ const SystemPointsPage = () => {
         <NoOpenSchoolYearNotice />
       )}
 
+      {!schoolYearError && hasOpenSchoolYear && !hasSchoolClasses && (
+        <NoSchoolClassesNotice />
+      )}
+
       {/* Resumo */}
       <div className="mb-4 p-4 border rounded-md bg-gray-100">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <fieldset disabled={!hasOpenSchoolYear} className="space-y-4">
+          <fieldset
+            disabled={!hasOpenSchoolYear || !hasSchoolClasses}
+            className="space-y-4"
+          >
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Bimestre

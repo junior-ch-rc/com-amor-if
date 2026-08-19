@@ -13,6 +13,7 @@ import { useAuth } from "../../providers/AuthProvider";
 import PontuacaoForm from "../components/PontuacaoForm";
 import { isFromCategory } from "../../utils/role";
 import NoOpenSchoolYearNotice from "../components/NoOpenSchoolYearNotice";
+import NoSchoolClassesNotice from "../components/NoSchoolClassesNotice";
 import { useOpenSchoolYear } from "../hooks/useOpenSchoolYear";
 
 // Cores para cada senso
@@ -38,6 +39,8 @@ const PointsPage = () => {
   const token = getToken();
   const {
     hasOpenSchoolYear,
+    schoolClasses,
+    hasSchoolClasses,
     isLoading: isSchoolYearLoading,
     error: schoolYearError,
   } = useOpenSchoolYear(token, Boolean(user));
@@ -222,6 +225,10 @@ const PointsPage = () => {
         <NoOpenSchoolYearNotice />
       )}
 
+      {!schoolYearError && hasOpenSchoolYear && !hasSchoolClasses && (
+        <NoSchoolClassesNotice />
+      )}
+
       {hasOpenSchoolYear && (
         <div className="overflow-x-auto flex flex-nowrap gap-2 border-b border-gray-300 mb-4">
           <Tab
@@ -245,10 +252,11 @@ const PointsPage = () => {
             {activeTab}
           </h2>
           <PontuacaoForm
-            setErrorMessage={setMessages}
             onSubmit={handleSubmit}
             key={activeTab}
             regrasDisponiveis={groupedRules[activeTab]}
+            turmasDisponiveis={schoolClasses}
+            disabled={!hasSchoolClasses}
           />
           <h2
             className="text-xl font-semibold my-8"

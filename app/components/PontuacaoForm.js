@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { fetchPrivateData } from "../../utils/api";
-import { useAuth } from "../../providers/AuthProvider";
+import React, { useState } from "react";
 import { FaCircleCheck, FaCircleMinus, FaCirclePlus } from "react-icons/fa6";
 import RuleSelect from "./RuleSelect";
 
@@ -10,11 +8,9 @@ const fieldLabelClassName = "block text-sm font-semibold text-gray-700";
 const fieldControlClassName =
   "mt-2 min-h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500";
 
-const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
-  const { getToken } = useAuth();
+const PontuacaoForm = ({ regrasDisponiveis, turmasDisponiveis = [], onSubmit, disabled = false }) => {
   const [regras, setRegras] = useState(regrasDisponiveis || []);
   const [operacao, setOperacao] = useState(null);
-  const [turmas, setTurmas] = useState([]);
   const [formData, setFormData] = useState({
     idTurma: "",
     idRegra: "",
@@ -26,25 +22,6 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
     turno: "",
   });
   const [tipoRegra, setTipoRegra] = useState(null);
-
-  // Fetch para buscar as turmas
-  useEffect(() => {
-    const fetchTurmas = async () => {
-      try {
-        const token = getToken(); // Obtém o token do usuário
-        const data = await fetchPrivateData(
-          "turma/turmas/ultimo-ano-letivo",
-          token
-        );
-        setTurmas(data);
-      } catch (error) {
-        setErrorMessage({
-          error: "Erro ao carregar turmas: " + error?.response?.data?.errors[0],
-        });
-      }
-    };
-    fetchTurmas();
-  }, [getToken]);
 
   const handleRegraChange = (regraId) => {
     const regraSelecionada = regras.find(
@@ -72,11 +49,13 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (disabled) return;
     onSubmit(formData, setFormData, setTipoRegra, setOperacao);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <fieldset disabled={disabled} className="space-y-6">
       {/* Seletor de Regra */}
       <div>
         <div className="flex min-h-6 flex-wrap items-center justify-between gap-2">
@@ -136,7 +115,7 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
               required
             >
               <option value="">Selecione uma turma</option>
-              {turmas.map((turma) => (
+              {turmasDisponiveis.map((turma) => (
                 <option key={turma.id} value={turma.id}>
                   {turma.nome}
                 </option>
@@ -234,6 +213,7 @@ const PontuacaoForm = ({ regrasDisponiveis, onSubmit, setErrorMessage }) => {
           Registrar Pontuação
         </button>
       </div>
+      </fieldset>
     </form>
   );
 };

@@ -9,7 +9,7 @@ const apiUrl = process.env.NEXT_PUBLIC_REACT_APP_API_URL; // Ajuste conforme sua
 
 const Ranking = () => {
   const [turmas, setTurmas] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const getTurmasPontuacao = async (url) => {
@@ -26,10 +26,7 @@ const Ranking = () => {
       // Ordena as turmas pela pontuação em ordem decrescente
       const sortedTurmas = data.sort((a, b) => b.pontuacao - a.pontuacao);
       setTurmas(sortedTurmas);
-    } catch (error) {
-      setErrorMessage(
-        "Erro ao buscar turmas: " + error.response.data.errors[0]
-      );
+    } catch {
       setErrorMessage(
         "Erro ao carregar o ranking. Por favor, tente novamente mais tarde."
       );
@@ -62,7 +59,19 @@ const Ranking = () => {
         />
       )}
 
-      {!isLoading && !errorMessage && (
+      {!isLoading && !errorMessage && turmas.length === 0 && (
+        <div
+          role="status"
+          className="rounded-md bg-gray-100 px-5 py-8 text-center text-gray-700"
+        >
+          <p className="text-lg font-semibold">O ranking estará disponível em breve!</p>
+          <p className="mt-2 text-sm md:text-base">
+            Ainda não há turmas cadastradas para o ano letivo atual.
+          </p>
+        </div>
+      )}
+
+      {!isLoading && !errorMessage && turmas.length > 0 && (
         <ul className="space-y-4">
           {turmas.map((turma, index) => {
             const isFirstPlace =

@@ -73,8 +73,14 @@ export const groupRulesByCategory = (rules = []) =>
   }, {});
 
 export const orderRuleGroups = (groups = []) => [
-  ...groups.filter(([groupName]) => groupName !== "Outros"),
-  ...groups.filter(([groupName]) => groupName === "Outros"),
+  ...groups.filter(
+    ([groupName]) =>
+      groupName !== "Outros" && groupName !== UNGROUPED_RULES_LABEL
+  ),
+  ...groups.filter(
+    ([groupName]) =>
+      groupName === "Outros" || groupName === UNGROUPED_RULES_LABEL
+  ),
 ];
 
 const RuleSelect = ({ rules = [], selectedRuleId, onChange }) => {

@@ -15,6 +15,7 @@ import { isFromCategory } from "../../utils/role";
 import NoOpenSchoolYearNotice from "../components/NoOpenSchoolYearNotice";
 import NoSchoolClassesNotice from "../components/NoSchoolClassesNotice";
 import { useOpenSchoolYear } from "../hooks/useOpenSchoolYear";
+import { orderSenseNames } from "../../utils/senses";
 
 // Cores para cada senso
 const SENSE_COLORS = {
@@ -79,8 +80,9 @@ const PointsPage = () => {
         acc[senso] = acc[senso] ? [...acc[senso], rule] : [rule];
         return acc;
       }, {});
+      const orderedSenses = orderSenseNames(Object.keys(grouped));
       setGroupedRules(grouped);
-      setActiveTab(Object.keys(grouped)[0] || null);
+      setActiveTab(orderedSenses[0] || null);
     } catch (error) {
       setMessages({
         error: "Erro ao carregar regras: " + error?.response?.data?.errors[0],
@@ -232,7 +234,7 @@ const PointsPage = () => {
       {hasOpenSchoolYear && (
         <div className="overflow-x-auto flex flex-nowrap gap-2 border-b border-gray-300 mb-4">
           <Tab
-            tabs={Object.keys(groupedRules)}
+            tabs={orderSenseNames(Object.keys(groupedRules))}
             activeTab={activeTab}
             onTabChange={handleTabChange}
             tabColors={SENSE_COLORS}

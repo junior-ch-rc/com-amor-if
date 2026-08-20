@@ -48,10 +48,11 @@ describe("groupRulesByCategory", () => {
     });
   });
 
-  it("mantém a categoria Outros por último", () => {
+  it("mantém as categorias genéricas e sem categoria por último", () => {
     const groups = [
       ["Rotina", [rules[0]]],
       ["Outros", [rules[1]]],
+      [UNGROUPED_RULES_LABEL, [rules[3]]],
       ["Biblioteca", [rules[2]]],
     ];
 
@@ -59,6 +60,7 @@ describe("groupRulesByCategory", () => {
       "Rotina",
       "Biblioteca",
       "Outros",
+      UNGROUPED_RULES_LABEL,
     ]);
   });
 });

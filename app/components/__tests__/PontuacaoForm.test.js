@@ -1,15 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import PontuacaoForm from "../PontuacaoForm";
-import { fetchPrivateData } from "../../../utils/api";
 
-jest.mock("../../../utils/api", () => ({
-  fetchPrivateData: jest.fn(),
-}));
-
-jest.mock("../../../providers/AuthProvider", () => ({
-  useAuth: () => ({ getToken: () => "token-de-teste" }),
-}));
+const classes = [{ id: "turma-1", nome: "1º Informática" }];
 
 const fixedRule = {
   id: 1,
@@ -32,15 +25,12 @@ const variableRule = {
 };
 
 describe("PontuacaoForm com seletor de regras pesquisável", () => {
-  beforeEach(() => {
-    fetchPrivateData.mockResolvedValue([{ id: "turma-1", nome: "1º Informática" }]);
-  });
-
   it("mantém os efeitos de uma regra fixa ao selecioná-la pela busca", async () => {
     const user = userEvent.setup();
     render(
       <PontuacaoForm
         regrasDisponiveis={[fixedRule, variableRule]}
+        turmasDisponiveis={classes}
         onSubmit={jest.fn()}
         setErrorMessage={jest.fn()}
       />
@@ -63,6 +53,7 @@ describe("PontuacaoForm com seletor de regras pesquisável", () => {
     render(
       <PontuacaoForm
         regrasDisponiveis={[fixedRule, variableRule]}
+        turmasDisponiveis={classes}
         onSubmit={jest.fn()}
         setErrorMessage={jest.fn()}
       />
@@ -93,12 +84,12 @@ describe("PontuacaoForm com seletor de regras pesquisável", () => {
     render(
       <PontuacaoForm
         regrasDisponiveis={[fixedRule]}
+        turmasDisponiveis={classes}
         onSubmit={onSubmit}
         setErrorMessage={jest.fn()}
       />
     );
 
-    await waitFor(() => expect(fetchPrivateData).toHaveBeenCalled());
     await user.click(screen.getByRole("combobox", { name: /buscar regra/i }));
     await user.click(
       screen.getByRole("option", { name: fixedRule.descricao })
@@ -117,5 +108,23 @@ describe("PontuacaoForm com seletor de regras pesquisável", () => {
       expect.any(Function),
       expect.any(Function)
     );
+  });
+
+  it("bloqueia todos os campos quando o ano aberto não possui turmas", () => {
+    render(
+      <PontuacaoForm
+        regrasDisponiveis={[fixedRule]}
+        turmasDisponiveis={[]}
+        onSubmit={jest.fn()}
+        disabled
+      />
+    );
+
+    expect(
+      screen.getByRole("combobox", { name: /buscar regra/i })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Registrar Pontuação" })
+    ).toBeDisabled();
   });
 });

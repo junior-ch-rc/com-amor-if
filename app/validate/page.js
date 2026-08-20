@@ -10,6 +10,8 @@ import Modal from "../components/Modal";
 import { fetchPrivateData, postPrivateData } from "../../utils/api";
 import { useAuth } from "../../providers/AuthProvider";
 import { format } from "date-fns";
+import NoOpenSchoolYearNotice from "../components/NoOpenSchoolYearNotice";
+import { useOpenSchoolYear } from "../hooks/useOpenSchoolYear";
 
 const tabs = [
   {
@@ -46,6 +48,11 @@ const PointsValidationPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const token = getToken();
+  const {
+    hasOpenSchoolYear,
+    isLoading: isSchoolYearLoading,
+    error: schoolYearError,
+  } = useOpenSchoolYear(token, Boolean(user));
 
   const fetchPoints = async (endpoint) => {
     try {
@@ -61,17 +68,22 @@ const PointsValidationPage = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && hasOpenSchoolYear) {
       const defaultTab = tabs.find((tab) => tab.label === activeTab);
       if (defaultTab) fetchPoints(defaultTab.endpoint);
+    } else if (!hasOpenSchoolYear) {
+      setPointsData([]);
     }
-  }, [activeTab, token, user]);
+  }, [activeTab, token, user, hasOpenSchoolYear]);
 
-  if (isLoading || isLoggingOut) return <LoadingSpinner />;
+  if (isLoading || isLoggingOut || isSchoolYearLoading)
+    return <LoadingSpinner />;
   if (!user) return <NotAuthorized />;
 
   // Função para definir as ações conforme a aba ativa
   const getActions = (tab) => {
+    if (!hasOpenSchoolYear) return [];
+
     switch (tab) {
       case "Pendentes":
         return [
@@ -225,6 +237,14 @@ const PointsValidationPage = () => {
 
       <h1 className="text-2xl font-bold mb-4">Validação de Pontuações</h1>
 
+      {schoolYearError && (
+        <MessageBox message={schoolYearError} color="detail-minor" />
+      )}
+
+      {!schoolYearError && !hasOpenSchoolYear && (
+        <NoOpenSchoolYearNotice />
+      )}
+
       {/* Componente de Abas */}
       <div className="overflow-x-auto flex flex-nowrap gap-2 border-b border-gray-300 mb-4">
         <Tab
@@ -237,7 +257,7 @@ const PointsValidationPage = () => {
 
       <br></br>
 
-      {activeTab === "Pendentes" && (
+      {hasOpenSchoolYear && activeTab === "Pendentes" && (
         <>
           <button
             key="aplicarTudo"

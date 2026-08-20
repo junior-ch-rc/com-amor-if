@@ -10,13 +10,16 @@ import Table from "../components/Table";
 import { isFromCategory } from "../../utils/role";
 import NotAuthorized from "../components/NotAuthorized";
 import { postPrivateData } from "@/utils/api";
+import NoOpenSchoolYearNotice from "../components/NoOpenSchoolYearNotice";
+import NoSchoolClassesNotice from "../components/NoSchoolClassesNotice";
+import { useOpenSchoolYear } from "../hooks/useOpenSchoolYear";
 
 const apiUrl = process.env.NEXT_PUBLIC_REACT_APP_API_URL;
 
 const itemsPerPage = 10;
 
 const SystemPointsPage = () => {
-  const { getToken, user } = useAuth();
+  const { getToken, user, isLoading, isLoggingOut } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [todasPontuacoes, setTodasPontuacoes] = useState([]);
@@ -24,6 +27,12 @@ const SystemPointsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const token = getToken();
+  const {
+    hasOpenSchoolYear,
+    hasSchoolClasses,
+    isLoading: isSchoolYearLoading,
+    error: schoolYearError,
+  } = useOpenSchoolYear(token, Boolean(user));
   const [formData, setFormData] = useState({
     bimestre: 0,
   });
@@ -48,8 +57,18 @@ const SystemPointsPage = () => {
     }
   };
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isSchoolYearLoading) return;
+
+    if (hasOpenSchoolYear && hasSchoolClasses) {
+      fetchData();
+    } else {
+      setTodasPontuacoes([]);
+      setLoading(false);
+    }
+  }, [hasOpenSchoolYear, hasSchoolClasses, isSchoolYearLoading]);
+
+  if (isLoading || isLoggingOut || isSchoolYearLoading)
+    return <LoadingSpinner />;
 
   if (
     !user ||
@@ -75,6 +94,7 @@ const SystemPointsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!hasOpenSchoolYear || !hasSchoolClasses) return;
     if (!token)
       return setMessages({ error: "Token de autenticação não encontrado" });
 
@@ -126,35 +146,52 @@ const SystemPointsPage = () => {
       )}
       <h1 className="text-2xl font-bold mb-4">Lançar Pontos de Sistema</h1>
 
+      {schoolYearError && (
+        <MessageBox message={schoolYearError} color="detail-minor" />
+      )}
+
+      {!schoolYearError && !hasOpenSchoolYear && (
+        <NoOpenSchoolYearNotice />
+      )}
+
+      {!schoolYearError && hasOpenSchoolYear && !hasSchoolClasses && (
+        <NoSchoolClassesNotice />
+      )}
+
       {/* Resumo */}
       <div className="mb-4 p-4 border rounded-md bg-gray-100">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Bimestre
-            </label>
-            <select
-              name="bimestre"
-              value={formData.bimestre}
-              onChange={handleInputChange}
-              className="w-full mt-1 p-2 border rounded"
-              required
-            >
-              <option value="0">1º Bimestre</option>
-              <option value="1">2º Bimestre</option>
-              <option value="2">3º Bimestre</option>
-              <option value="3">4º Bimestre</option>
-            </select>
-          </div>
-          {/* Submit Button */}
-          <div>
-            <button
-              className={`px-4 py-2 m-1 mb-6 text-md font-medium rounded bg-green-500`}
-              type="submit"
-            >
-              Lançar Pontuações de Sistema
-            </button>
-          </div>
+          <fieldset
+            disabled={!hasOpenSchoolYear || !hasSchoolClasses}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Bimestre
+              </label>
+              <select
+                name="bimestre"
+                value={formData.bimestre}
+                onChange={handleInputChange}
+                className="w-full mt-1 p-2 border rounded"
+                required
+              >
+                <option value="0">1º Bimestre</option>
+                <option value="1">2º Bimestre</option>
+                <option value="2">3º Bimestre</option>
+                <option value="3">4º Bimestre</option>
+              </select>
+            </div>
+            {/* Submit Button */}
+            <div>
+              <button
+                className="px-4 py-2 m-1 mb-6 text-md font-medium rounded bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
+                type="submit"
+              >
+                Lançar Pontuações de Sistema
+              </button>
+            </div>
+          </fieldset>
         </form>
       </div>
 

@@ -14,12 +14,13 @@ describe("Ranking", () => {
   it("ordena as turmas e mostra a distância para a posição anterior", async () => {
     global.fetch.mockResolvedValue({ ok: true, json: async () => [
       { id: 2, nome: "Informática", descricao: "Infominds", pontuacao: 75 },
-      { id: 1, nome: "Administração", descricao: "Admísticos", pontuacao: 100 },
+      { id: 1, nome: "Administração", descricao: "Admísticos", pontuacao: 100, anoLetivo: { ano_letivo: 2026 } },
     ] });
     render(<Ranking />);
     const items = await screen.findAllByRole("listitem");
     expect(items[0]).toHaveTextContent("Admísticos");
     expect(items[0]).toHaveTextContent("Liderança");
+    expect(screen.getByText("Disputa de 2026")).toBeInTheDocument();
     expect(items[1]).toHaveTextContent("Faltam 25 pts para o 1º lugar");
   });
 

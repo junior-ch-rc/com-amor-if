@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaBolt, FaCrown, FaFlagCheckered, FaMedal, FaStar } from "react-icons/fa";
+import { FaCrown, FaFlagCheckered, FaMedal } from "react-icons/fa";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageBox from "./MessageBox";
 
@@ -15,7 +15,6 @@ const podiumStyles = [
 const getBadge = (position, points) => {
   if (position === 0 && points > 0) return { text: "Liderança", icon: FaCrown };
   if (position < 3 && points > 0) return { text: "Top 3", icon: FaMedal };
-  if (points >= 100) return { text: "+100 pontos", icon: FaStar };
   return null;
 };
 
@@ -41,20 +40,21 @@ const Ranking = () => {
   }, []);
 
   const leaderPoints = Math.max(Number(turmas[0]?.pontuacao) || 0, 1);
+  const schoolYear = turmas[0]?.anoLetivo?.ano_letivo;
 
   return (
     <section id="ranking" aria-labelledby="ranking-title" className="mx-auto mt-6 w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5">
-      <header className="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-primary-light px-4 py-7 text-white sm:px-8 sm:py-9">
+      <header className="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-primary-light px-4 py-5 text-white sm:px-8 sm:py-6">
         <div className="pointer-events-none absolute -right-8 -top-12 h-40 w-40 rounded-full bg-white/10" />
         <div className="pointer-events-none absolute -bottom-14 -left-10 h-36 w-36 rounded-full bg-accent/20" />
         <div className="relative flex flex-col items-center text-center">
-          <div className="mb-3 flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider sm:text-sm"><FaFlagCheckered aria-hidden="true" />Disputa do ano letivo</div>
+          <div className="mb-2 flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider sm:text-sm"><FaFlagCheckered aria-hidden="true" />{schoolYear ? `Disputa de ${schoolYear}` : "Disputa do ano letivo"}</div>
           <h2 id="ranking-title" className="text-2xl font-black sm:text-3xl">Corrida das Turmas</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90 sm:text-base">Cada ponto aproxima sua turma do pódio. Quem vai conquistar a liderança?</p>
         </div>
       </header>
 
-      <div className="p-3 sm:p-6 md:p-8">
+      <div className="p-3 sm:p-5 md:p-6">
         {isLoading && <LoadingSpinner />}
         {errorMessage && <MessageBox message={errorMessage} color="detail-minor" onClose={() => setErrorMessage(null)} />}
         {!isLoading && !errorMessage && turmas.length === 0 && (
@@ -64,7 +64,7 @@ const Ranking = () => {
           </div>
         )}
         {!isLoading && !errorMessage && turmas.length > 0 && (
-          <ol className="space-y-3 sm:space-y-4" aria-label="Classificação das turmas">
+          <ol className="space-y-2.5 sm:space-y-3" aria-label="Classificação das turmas">
             {turmas.map((turma, index) => {
               const points = Number(turma.pontuacao) || 0;
               const progress = Math.max(0, Math.min(100, (points / leaderPoints) * 100));
@@ -74,29 +74,26 @@ const Ranking = () => {
               const badge = getBadge(index, points);
               const BadgeIcon = badge?.icon;
               return (
-                <li key={turma.id} className={`ranking-card relative rounded-xl border p-3 shadow-sm transition duration-200 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-md sm:p-5 ${podium ? podium.card : "border-gray-200 bg-gray-50"}`} style={{ animationDelay: `${Math.min(index * 80, 480)}ms` }}>
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black shadow-sm sm:h-12 sm:w-12 sm:text-base ${podium ? podium.position : "bg-white text-gray-700 ring-1 ring-gray-200"}`} aria-label={`${index + 1}º lugar${podium ? `, medalha de ${podium.label}` : ""}`}>
-                      {index < 3 ? <FaMedal aria-hidden="true" /> : `${index + 1}º`}
+                <li key={turma.id} className={`ranking-card relative rounded-xl border p-3 shadow-sm transition duration-200 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-md sm:px-4 sm:py-3.5 ${podium ? podium.card : "border-gray-200 bg-gray-50"}`} style={{ animationDelay: `${Math.min(index * 60, 420)}ms` }}>
+                  <div className="flex items-start gap-3">
+                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-black shadow-sm sm:h-10 sm:w-10 sm:text-sm ${podium ? podium.position : "bg-white text-gray-700 ring-1 ring-gray-200"}`} aria-label={`${index + 1}º lugar${podium ? `, medalha de ${podium.label}` : ""}`}>
+                      {index + 1}º
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="flex items-start justify-between gap-2 sm:gap-4">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="break-words text-base font-bold text-gray-900 sm:text-lg">{turma.descricao}</h3>
+                            <h3 className="break-words text-sm font-bold text-gray-900 sm:text-base">{turma.descricao}</h3>
                             {badge && <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2 py-1 text-[0.68rem] font-bold uppercase tracking-wide text-primary-dark ring-1 ring-primary/15 sm:text-xs"><BadgeIcon aria-hidden="true" />{badge.text}</span>}
                           </div>
-                          <p className="mt-0.5 break-words text-sm text-gray-600">{turma.nome}</p>
+                          <p className="mt-0.5 break-words text-xs text-gray-600 sm:text-sm">{turma.nome}</p>
                         </div>
-                        <p className="shrink-0 text-left text-lg font-black tabular-nums text-primary-dark sm:text-right sm:text-xl">{points.toLocaleString("pt-BR")} <span className="text-xs font-bold">pts</span></p>
+                        <p className="shrink-0 text-right text-base font-black tabular-nums text-primary-dark sm:text-lg">{points.toLocaleString("pt-BR")} <span className="text-[0.65rem] font-bold sm:text-xs">pts</span></p>
                       </div>
-                      <div className="mt-3 h-3 overflow-hidden rounded-full bg-black/10" aria-hidden="true">
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/10" aria-hidden="true">
                         <div className={`ranking-progress h-full origin-left rounded-full bg-gradient-to-r ${podium?.bar || "from-primary to-primary-light"}`} style={{ width: `${progress}%` }} />
                       </div>
-                      <div className="mt-2 flex flex-col gap-1 text-xs text-gray-600 sm:flex-row sm:items-center sm:justify-between sm:text-sm">
-                        <span>{Math.round(progress)}% da pontuação da líder</span>
-                        {index === 0 && points > 0 ? <span className="inline-flex items-center gap-1 font-bold text-primary-dark"><FaBolt aria-hidden="true" />Turma a ser alcançada</span> : gap > 0 ? <span className="font-semibold text-gray-700">Faltam {gap.toLocaleString("pt-BR")} pts para o {index}º lugar</span> : <span className="font-semibold text-gray-700">Empate na disputa pela posição</span>}
-                      </div>
+                      {index > 0 && <p className="mt-1.5 text-[0.7rem] font-medium text-gray-600 sm:text-xs">{gap > 0 ? `Faltam ${gap.toLocaleString("pt-BR")} pts para o ${index}º lugar` : "Empate na disputa pela posição"}</p>}
                     </div>
                   </div>
                 </li>

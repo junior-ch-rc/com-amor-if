@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaCrown, FaFlagCheckered, FaMedal } from "react-icons/fa";
+import { FaCrown, FaFlagCheckered, FaMedal, FaRocket } from "react-icons/fa";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageBox from "./MessageBox";
 
 const apiUrl = process.env.NEXT_PUBLIC_REACT_APP_API_URL;
 const podiumStyles = [
   { label: "Ouro", card: "border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-100", position: "bg-amber-400 text-amber-950", bar: "from-amber-400 to-yellow-300" },
-  { label: "Prata", card: "border-slate-300 bg-gradient-to-br from-slate-50 to-slate-100", position: "bg-slate-300 text-slate-800", bar: "from-slate-400 to-slate-300" },
+  { label: "Prata", card: "border-slate-300 bg-gradient-to-br from-slate-50 to-slate-100", position: "bg-slate-300 text-slate-800", bar: "from-slate-700 to-slate-500" },
   { label: "Bronze", card: "border-orange-300 bg-gradient-to-br from-orange-50 to-orange-100", position: "bg-orange-400 text-orange-950", bar: "from-orange-500 to-orange-300" },
 ];
 
@@ -47,8 +47,11 @@ const Ranking = () => {
       <header className="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-primary-light px-4 py-5 text-white sm:px-8 sm:py-6">
         <div className="pointer-events-none absolute -right-8 -top-12 h-40 w-40 rounded-full bg-white/10" />
         <div className="pointer-events-none absolute -bottom-14 -left-10 h-36 w-36 rounded-full bg-accent/20" />
+        <div className="rocket-flight pointer-events-none absolute right-4 top-1/2 z-0 text-2xl text-accent-soft drop-shadow-md sm:right-8 sm:text-3xl" aria-hidden="true">
+          <FaRocket className="-rotate-45" />
+        </div>
         <div className="relative flex flex-col items-center text-center">
-          <div className="mb-2 flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider sm:text-sm"><FaFlagCheckered aria-hidden="true" />{schoolYear ? `Disputa de ${schoolYear}` : "Disputa do ano letivo"}</div>
+          <div className="mb-4 flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider sm:text-sm"><FaFlagCheckered aria-hidden="true" />{schoolYear ? `Disputa de ${schoolYear}` : "Disputa do ano letivo"}</div>
           <h2 id="ranking-title" className="text-2xl font-black sm:text-3xl">Corrida das Turmas</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90 sm:text-base">Cada ponto aproxima sua turma do pódio. Quem vai conquistar a liderança?</p>
         </div>

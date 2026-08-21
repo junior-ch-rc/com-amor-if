@@ -47,12 +47,12 @@ const Ranking = () => {
       <header className="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-primary-light px-4 py-5 text-white sm:px-8 sm:py-6">
         <div className="pointer-events-none absolute -right-8 -top-12 h-40 w-40 rounded-full bg-white/10" />
         <div className="pointer-events-none absolute -bottom-14 -left-10 h-36 w-36 rounded-full bg-accent/20" />
-        <div className="rocket-flight pointer-events-none absolute right-4 top-1/2 z-0 text-2xl text-accent-soft drop-shadow-md sm:right-8 sm:text-3xl" aria-hidden="true">
+        <div className="rocket-flight pointer-events-none absolute right-8 top-1/2 z-0 text-2xl text-accent-soft drop-shadow-md sm:right-10 sm:text-3xl" aria-hidden="true">
           <span className="rocket-smoke" />
           <FaRocket className="-rotate-45" />
         </div>
         <div className="relative flex flex-col items-center text-center">
-          <div className="mb-4 flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider sm:text-sm"><FaFlagCheckered aria-hidden="true" />{schoolYear ? `Disputa de ${schoolYear}` : "Disputa do ano letivo"}</div>
+          <div className="mb-4 flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider sm:text-sm"><FaFlagCheckered aria-hidden="true" />{schoolYear ? `Edição ${schoolYear}` : "Edição atual"}</div>
           <h2 id="ranking-title" className="text-2xl font-black sm:text-3xl">Corrida das Turmas</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90 sm:text-base">Cada ponto aproxima sua turma do pódio. Quem vai conquistar a liderança?</p>
         </div>

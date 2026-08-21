@@ -29,9 +29,12 @@ const podiumData = [
 
 export default function PodiumCarousel() {
   return (
-    <section className="py-12 px-4">
+    <section className="mt-12 border-y border-amber-200/70 bg-gradient-to-b from-amber-50 to-orange-50/40 px-4 py-12 sm:py-16">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
+          <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-800 ring-1 ring-amber-200 sm:text-sm">
+            Galeria de campeões
+          </span>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">
             Pódio da Edição 2025
           </h2>

@@ -103,9 +103,9 @@ export default function PodiumCarousel() {
             ))}
           </Swiper>
 
-          <div className="pointer-events-none absolute top-0 left-0 h-full w-10 md:w-12 bg-gradient-to-r from-white to-transparent z-10" />
+          <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-10 bg-gradient-to-r from-amber-50 via-amber-50/80 to-transparent md:w-12" />
 
-          <div className="pointer-events-none absolute top-0 right-0 h-full w-10 md:w-12 bg-gradient-to-l from-white to-transparent z-10" />
+          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-10 bg-gradient-to-l from-amber-50 via-amber-50/80 to-transparent md:w-12" />
         </div>
       </div>
     </section>

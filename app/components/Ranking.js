@@ -48,6 +48,7 @@ const Ranking = () => {
         <div className="pointer-events-none absolute -right-8 -top-12 h-40 w-40 rounded-full bg-white/10" />
         <div className="pointer-events-none absolute -bottom-14 -left-10 h-36 w-36 rounded-full bg-accent/20" />
         <div className="rocket-flight pointer-events-none absolute right-4 top-1/2 z-0 text-2xl text-accent-soft drop-shadow-md sm:right-8 sm:text-3xl" aria-hidden="true">
+          <span className="rocket-smoke" />
           <FaRocket className="-rotate-45" />
         </div>
         <div className="relative flex flex-col items-center text-center">

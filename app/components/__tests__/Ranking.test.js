@@ -9,6 +9,9 @@ describe("Ranking", () => {
     global.fetch.mockResolvedValue({ ok: true, json: async () => [] });
     render(<Ranking />);
     expect(await screen.findByRole("status")).toHaveTextContent("O ranking estará disponível em breve");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Ainda não há turmas cadastradas para o ano letivo atual"
+    );
   });
 
   it("ordena as turmas e mostra a distância para a posição anterior", async () => {

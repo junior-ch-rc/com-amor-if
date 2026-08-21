@@ -10,6 +10,7 @@ import { isFromCategory } from "../../utils/role";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { fetchPrivateData, postPrivateData } from "../../utils/api"; // Import das funções
 import { useAuth } from "../../providers/AuthProvider";
+import { mergeSavedSchoolYear } from "../../utils/schoolYear";
 
 const AcademicYearManagement = () => {
   const [years, setYears] = useState([]);
@@ -85,11 +86,9 @@ const AcademicYearManagement = () => {
         },
         token
       );
-      if (editingYear) {
-        setYears(years.map((y) => (y.id === response.id ? response : y)));
-      } else {
-        setYears([...years, response]);
-      }
+      setYears((currentYears) =>
+        mergeSavedSchoolYear(currentYears, response)
+      );
       setModalOpen(false);
       setEditingYear(null);
     } catch (error) {
